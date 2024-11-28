@@ -147,6 +147,7 @@
      # Add zen-browser later on
   ];
 
+  # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
     source-code-pro
     noto-fonts
