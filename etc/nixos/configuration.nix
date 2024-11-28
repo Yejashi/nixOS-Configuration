@@ -33,9 +33,6 @@
             configurationLimit = 5;
             timeout = 5;
         };
-
-        efi.canTouchEfiVariable = true;
-
     };
   };
 
