@@ -96,6 +96,10 @@
     ".mozilla/firefox/huuecasm.default/user.js" = {
       source = ./user.js;
     };
+
+    ".vimrc" = {
+      source = ./.vimrc;
+    };
   };
 
   # Home Manager can also manage your environment variables through
