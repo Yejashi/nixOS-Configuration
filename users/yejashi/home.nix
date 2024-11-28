@@ -107,7 +107,7 @@
       source = ./.bashrc;
     };
 
-    "~/Documents/wallpapers/walls" = {
+    "Documents/wallpapers/walls" = {
       source = ./walls;
     };
   };
