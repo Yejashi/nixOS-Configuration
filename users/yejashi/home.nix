@@ -159,7 +159,11 @@
     };
   };
   
-
+  programs.gnome-shell = {
+    theme = {
+        name = "Orchis-Dark";
+    }
+  };
 
   # TODO: What to do with this?
 #   programs.python = {
