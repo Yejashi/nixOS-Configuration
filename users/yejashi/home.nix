@@ -153,9 +153,9 @@
     };
 
     # TODO: Why doesn't close work???
-    # "org/gnome/desktop/wm/preferences" = {
-    #     button-layout = "'appmenu:minimize,maximize,close'";
-    # };
+    "org/gnome/desktop/wm/preferences" = {
+        button-layout = "'appmenu:minimize,maximize'";
+    };
 
   };
   # TODO: What to do with this?
