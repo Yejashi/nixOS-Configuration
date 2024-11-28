@@ -102,6 +102,10 @@
     ".vimrc" = {
       source = ./.vimrc;
     };
+
+    ".bashrc" = {
+      source = ./.bashrc;
+    };
   };
 
   # Home Manager can also manage your environment variables through
