@@ -125,12 +125,15 @@
   };
 
   dconf.settings = {
-    "org/gnome/shell".enabled-extensions = 
-      (map (extension: extension.extensionUuid) 
-        (filter (pkg: pkg ? gnomeExtensions) home.packages))
-      ++ [
+    # ...
+    "org/gnome/shell" = {
+      disable-user-extensions = false;
+
+      # `gnome-extensions list` for a list
+      enabled-extensions = [
         "user-theme@gnome-shell-extensions.gcampax.github.com"
       ];
+    };
   };
   # TODO: What to do with this?
 #   programs.python = {
