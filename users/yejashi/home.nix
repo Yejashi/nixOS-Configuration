@@ -53,6 +53,12 @@
     # starship
     ranger
     # vimPlugins.vim-plug
+    # Gnome Extensions
+    gnomeExtensions.blur-my-shell
+    gnomeExtensions.bluetooth-battery-meter
+    gnomeExtensions.just-perfection
+    gnomeExtensions.tray-icons-reloaded
+    gnomeExtensions.user-themes
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -118,6 +124,13 @@
 
   };
 
+  dconf.settings = {
+    "org/gnome/shell".enabled-extensions = (map (extension: extension.extensionUuid) home.packages)
+    ++
+    [
+      "user-theme@gnome-shell-extensions.gcampax.github.com"
+    ];
+  };
   # TODO: What to do with this?
 #   programs.python = {
 #     enable = true;

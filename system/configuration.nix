@@ -146,12 +146,6 @@
     # Gnome Packages
     gnome3.gnome-tweaks
 
-    # Gnome Extensions
-    gnomeExtensions.blur-my-shell
-    gnomeExtensions.bluetooth-battery-meter
-    gnomeExtensions.just-perfection
-    gnomeExtensions.tray-icons-reloaded
-    gnomeExtensions.user-themes
 
     # Icons + Themes
     tela-circle-icon-theme
@@ -166,13 +160,6 @@
     # Add zen-browser later on
   ];
 
-  dconf.settings = {
-    "org/gnome/shell".enabled-extensions = (map (extension: extension.extensionUuid) home.packages)
-    ++
-    [
-      "user-theme@gnome-shell-extensions.gcampax.github.com"
-    ];
-  };
 
   # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
