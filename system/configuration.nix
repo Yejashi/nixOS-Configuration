@@ -140,7 +140,7 @@
      vim
      git
      sshfs
-     gnome-tweaks
+     gnome3.gnome-tweaks
      kitty
      xfce.thunar
      vscode
