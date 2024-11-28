@@ -143,6 +143,7 @@
      kitty
      xfce.thunar
      vscode
+     material-icons
      # Add zen-browser later on
   ];
 
