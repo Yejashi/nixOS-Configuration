@@ -157,8 +157,19 @@
         button-layout = "appmenu:minimize,maximize,close";
         action-middle-click-titlebar = "minimize";
     };
-
   };
+  
+  xdg.gnome = {
+    enable = true;
+
+    settings.gnome-shell = {
+        "org.gnome.shell.extensions.user-theme" = {
+            "name" = "Orchis-Dark";
+        };
+    };
+  };
+
+
   # TODO: What to do with this?
 #   programs.python = {
 #     enable = true;
