@@ -86,9 +86,8 @@
       recursive = true;
     };
 
-    ".mozilla/firefox/huuecasm.default" = {
-      source = ./chrome;
-      recursive = true;
+    ".mozilla/firefox/huuecasm.default/user.js" = {
+      source = ./user.js;
     };
   };
 
