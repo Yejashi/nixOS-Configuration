@@ -153,7 +153,7 @@
     };
 
     "org/gnome/desktop/wm/preferences" = {
-        button-layout = "':minimize,maximize,close'";
+        button-layout = "'appmenu:minimize,maximize,close'";
     };
 
   };
