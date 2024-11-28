@@ -159,15 +159,6 @@
     };
   };
   
-  xdg.gnome = {
-    enable = true;
-
-    settings.gnome-shell = {
-        "org.gnome.shell.extensions.user-theme" = {
-            "name" = "Orchis-Dark";
-        };
-    };
-  };
 
 
   # TODO: What to do with this?

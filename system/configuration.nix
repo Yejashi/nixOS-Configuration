@@ -186,6 +186,16 @@
     presets = [ "tokyo-night" ];
   };
 
+  xdg.gnome = {
+    enable = true;
+
+    settings.gnome-shell = {
+        "org.gnome.shell.extensions.user-theme" = {
+            "name" = "Orchis-Dark";
+        };
+    };
+  };
+  
   services.input-remapper.enable = true;
 
 
