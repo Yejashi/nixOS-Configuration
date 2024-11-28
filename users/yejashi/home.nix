@@ -137,6 +137,17 @@
         "Bluetooth-Battery-Meter@maniacx.github.com"
         "just-perfection-desktop@just-perfection"
       ];
+
+      favorite-apps = [
+        "firefox.desktop"
+        "code.desktop"
+        "spotify.desktop"
+        "org.gnome.Nautilus.desktop"
+      ];
+    };
+
+    "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
     };
   };
   # TODO: What to do with this?
