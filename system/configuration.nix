@@ -141,6 +141,7 @@
      git
      sshfs
      python312
+     python312Packages.pillow
      gnome3.gnome-tweaks
      # Gnome Extensions
      gnomeExtensions.blur-my-shell
