@@ -51,6 +51,7 @@
     input-remapper
     rofi
     ranger
+    vimPlugins.vim-plug
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
