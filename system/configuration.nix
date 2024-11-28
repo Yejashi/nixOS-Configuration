@@ -141,6 +141,7 @@
      git
      sshfs
      gnome3.gnome-tweaks
+     gnomeExtensions.blur-my-shell
      kitty
      xfce.thunar
      vscode
