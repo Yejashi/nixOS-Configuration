@@ -140,6 +140,7 @@
      vim
      git
      sshfs
+     gnome-tweaks
      kitty
      xfce.thunar
      vscode
@@ -155,6 +156,7 @@
     nerdfonts
   ];
 
+  # Can't do this in home-manager for some reason, bummer
   programs.starship = {
     enable = true;
     interactiveOnly = true;
