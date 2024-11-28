@@ -29,6 +29,9 @@
     loader = {
         grub = {
             enable = true;
+            version = 2;
+            devices = [ "/dev/vda" ];
+            useOSProber = true;
             # You can have at most 5 nixos configurations at a time
             configurationLimit = 5;
             timeout = 5;
