@@ -81,6 +81,12 @@
       recursive = true;
     };
 
+    ".config/kitty" = {
+      source = ./kitty;
+      recursive = true;
+    };
+
+    # Make firefox look roundy, might i say ride eternal, shiny and chrome
     ".mozilla/firefox/huuecasm.default/chrome" = {
       source = ./chrome;
       recursive = true;
