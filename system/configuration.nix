@@ -140,7 +140,7 @@
      vim
      git
      sshfs
-     python313
+     python312
      gnome3.gnome-tweaks
      # Gnome Extensions
      gnomeExtensions.blur-my-shell
