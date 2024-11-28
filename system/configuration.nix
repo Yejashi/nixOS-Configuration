@@ -166,12 +166,12 @@
     # Add zen-browser later on
   ];
 
-    programs.gnome = {
-        enable = true;
-        extensions = [
-            "blur-my-shell@aunetx "
-        ];
+  dconf.settings = {
+    "org/gnome/shell" = {
+        disable-user-extensions = false;
+
     };
+  };
 
   # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
