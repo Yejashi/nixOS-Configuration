@@ -142,12 +142,20 @@
     sshfs
     python312
     python312Packages.pillow
+
+    # Gnome Packages
     gnome3.gnome-tweaks
+
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
     gnomeExtensions.bluetooth-battery-meter
     gnomeExtensions.just-perfection
     gnomeExtensions.tray-icons-reloaded
+
+    # Icons + Themes
+    tela-circle-icon-theme
+    orchis-theme
+    
     kitty
     xfce.thunar
     vscode
@@ -184,6 +192,8 @@
   };
 
   services.input-remapper.enable = true;
+
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
