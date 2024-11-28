@@ -131,11 +131,13 @@
 
       # `gnome-extensions list` for a list
       enabled-extensions = [
-        "user-theme@gnome-shell-extensions.gcampax.github.com"
-        "trayIconsReloaded@selfmade.pl"
         "blur-my-shell@aunetx"
         "Bluetooth-Battery-Meter@maniacx.github.com"
+        "trayIconsReloaded@selfmade.pl"
         "just-perfection-desktop@just-perfection"
+        "system-monitor@gnome-shell-extensions.gcampax.github.com"
+        "user-theme@gnome-shell-extensions.gcampax.github.com"
+        "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
       ];
 
       favorite-apps = [
