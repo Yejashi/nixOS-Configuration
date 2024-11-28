@@ -146,25 +146,23 @@
         "spotify.desktop"
         "org.gnome.Nautilus.desktop"
       ];
+
+      "org/gnome/shell/extensions/user-theme" = {
+        name = "Orchis-Dark";
+      };
     };
 
     "org/gnome/desktop/interface" = {
         color-scheme = "prefer-dark";
     };
 
-    # TODO: Why doesn't close work???
     "org/gnome/desktop/wm/preferences" = {
         button-layout = "appmenu:minimize,maximize,close";
         action-middle-click-titlebar = "minimize";
     };
   };
-  
-#   programs.gnome-shell = {
-#     theme = {
-#         name = "Orchis-Dark";
-#     };
-#   };
-
+    
+    # Legacy Application Theme
     gtk = {
         enable = true;
 
