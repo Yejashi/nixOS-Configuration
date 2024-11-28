@@ -1,3 +1,6 @@
+It is the morning of Thanksgiving 2024, i wonder, as i write this, why i put myself through the suffering colloquially known as linux. Alas, pain begets progress and so i shall.
+
+
 git submodule update --init --recursive
 
 sudo nixos-rebuild switch -I nixos-config=./system/configuration.nix
