@@ -123,7 +123,6 @@
     };
 
     presets = [
-        "tokyo-night"
     ];
   };
   # Home Manager can also manage your environment variables through
