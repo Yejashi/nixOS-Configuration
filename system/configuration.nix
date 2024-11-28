@@ -63,11 +63,11 @@
       enable = true;
 
       displayManager = {
-	gdm.enable = true;
+	    gdm.enable = true;
       };
       desktopManager = {
         # Enable the GNOME Desktop Environment.
-	gnome.enable = true;
+	    gnome.enable = true;
       };
     };
   };
@@ -140,6 +140,7 @@
      vim
      git
      sshfs
+     python313
      gnome3.gnome-tweaks
      # Gnome Extensions
      gnomeExtensions.blur-my-shell
