@@ -6,7 +6,9 @@ Download the gnome [iso](https://github.com/Yejashi/nixOS-Configuration.git) and
 ### Step 2
 Once you've booted into the OS then you need to temporarly aquire git as it is not installed by default. 
 
-This is done through the following command: `nix-shell -p git`
+This is done through the following command: `nix-shell -p git`.
+
+In case this has not already been done, you also need to label the root partition as follows: `sudo e2label /dev<root_partition> root`
 
 ### Step 3
 Clone this repository `https://github.com/Yejashi/nixOS-Configuration.git`.

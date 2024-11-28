@@ -89,9 +89,19 @@
       recursive = true;
     };
 
+    ".config/input-remapper-2" = {
+      source = ./input-remapper-2;
+      recursive = true;
+    };
+
     # Make firefox look roundy, might i say ride eternal, shiny and chrome
     ".mozilla/firefox/huuecasm.default/chrome" = {
       source = ./chrome;
+      recursive = true;
+    };
+
+    "Documents/wallpapers/walls" = {
+      source = ./walls;
       recursive = true;
     };
 
@@ -107,9 +117,6 @@
       source = ./.bashrc;
     };
 
-    "Documents/wallpapers/walls" = {
-      source = ./walls;
-    };
   };
 
   # TODO: What to do with this?
@@ -117,7 +124,6 @@
 #     enable = true;
 #     package = pkgs.python312;
 #   };
-
   
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
