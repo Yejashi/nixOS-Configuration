@@ -31,11 +31,11 @@
             enable = true;
             # You can have at most 5 nixos configurations at a time
             configurationLimit = 5;
+            timeout = 5;
         };
 
         efi.canTouchEfiVariable = true;
 
-        timeout = 5;
     };
   };
 
