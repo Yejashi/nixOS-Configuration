@@ -106,6 +106,10 @@
     ".bashrc" = {
       source = ./.bashrc;
     };
+
+    "~/Documents/wallpapers/walls" = {
+      source = ./walls;
+    };
   };
 
   # TODO: What to do with this?
