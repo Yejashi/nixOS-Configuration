@@ -153,7 +153,7 @@
     };
 
     "org/gnome/desktop/wm/preferences" = {
-        button-layot = "':minimize,maximize,close'";
+        button-layout = "':minimize,maximize,close'";
     };
 
   };
