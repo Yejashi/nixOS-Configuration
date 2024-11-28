@@ -43,6 +43,7 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
     htop
+    neofetch
     spotify
     foliate
     variety
@@ -67,6 +68,21 @@
     # '';
     ".config/ranger" = {
       source = ./ranger;
+      recursive = true;
+    };
+
+    ".config/rofi" = {
+      source = ./rofi;
+      recursive = true;
+    };
+
+    ".config/neofetch" = {
+      source = ./neofetch;
+      recursive = true;
+    };
+
+    ".mozilla/firefox/huuecasm.default" = {
+      source = ./chrome;
       recursive = true;
     };
   };
