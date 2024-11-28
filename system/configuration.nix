@@ -139,6 +139,7 @@
      zip
      vim
      git
+     sshfs
      kitty
      xfce.thunar
      vscode

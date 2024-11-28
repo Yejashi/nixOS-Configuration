@@ -50,6 +50,8 @@
     slack
     input-remapper
     rofi
+    fzf
+    starship
     ranger
     # vimPlugins.vim-plug
   ];
