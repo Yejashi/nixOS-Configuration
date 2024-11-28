@@ -152,8 +152,8 @@
         color-scheme = "prefer-dark";
     };
 
-    dconf.settings = {
-    "org/gnome/desktop/wm/preferences".button-layout = "':minimize,maximize,close'";
+    "org/gnome/desktop/wm/preferences" = {
+        button-layot = "':minimize,maximize,close'";
     };
 
   };
