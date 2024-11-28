@@ -144,6 +144,7 @@
      xfce.thunar
      vscode
      material-icons
+     starship
      # Add zen-browser later on
   ];
 
@@ -154,6 +155,23 @@
     nerdfonts
   ];
 
+  programs.starship = {
+    enable = true;
+    interactiveOnly = true;
+    # Configuration written to ~/.config/starship.toml
+    settings = {
+      # add_newline = false;
+
+      # character = {
+      #   success_symbol = "[➜](bold green)";
+      #   error_symbol = "[➜](bold red)";
+      # };
+
+      # package.disabled = true;
+    };
+
+    # presets = [];
+  };
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave

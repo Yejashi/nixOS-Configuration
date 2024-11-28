@@ -51,7 +51,7 @@
     input-remapper
     rofi
     fzf
-    starship
+    # starship
     ranger
     # vimPlugins.vim-plug
   ];
@@ -108,23 +108,6 @@
     };
   };
 
-  programs.starship.interactiveOnly = true;
-  programs.starship = {
-    enable = true;
-    # Configuration written to ~/.config/starship.toml
-    settings = {
-      # add_newline = false;
-
-      # character = {
-      #   success_symbol = "[➜](bold green)";
-      #   error_symbol = "[➜](bold red)";
-      # };
-
-      # package.disabled = true;
-    };
-
-    # presets = [];
-  };
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
   # shell provided by Home Manager. If you don't want to manage your shell
