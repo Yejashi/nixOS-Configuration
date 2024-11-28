@@ -159,11 +159,20 @@
     };
   };
   
-  programs.gnome-shell = {
-    theme = {
-        name = "Orchis-Dark";
+#   programs.gnome-shell = {
+#     theme = {
+#         name = "Orchis-Dark";
+#     };
+#   };
+
+    gtk = {
+        enable = true;
+
+        theme = {
+            name = "Orchis-Dark";
+            package = pkgs.orchis-theme;
+        };
     };
-  };
 
   # TODO: What to do with this?
 #   programs.python = {
