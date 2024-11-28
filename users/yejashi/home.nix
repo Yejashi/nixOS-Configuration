@@ -133,6 +133,9 @@
       enabled-extensions = [
         "user-theme@gnome-shell-extensions.gcampax.github.com"
         "trayIconsReloaded@selfmade.pl"
+        "blur-my-shell@aunetx"
+        "Bluetooth-Battery-Meter@maniacx.github.com"
+        "just-perfection-desktop@just-perfection"
       ];
     };
   };
