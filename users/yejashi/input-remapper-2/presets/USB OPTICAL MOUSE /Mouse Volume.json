@@ -1,0 +1,26 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 276,
+                "origin_hash": "38db84145f2603e735b57845aab5282a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "XF86AudioRaiseVolume",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 275,
+                "origin_hash": "38db84145f2603e735b57845aab5282a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "XF86AudioLowerVolume",
+        "mapping_type": "key_macro"
+    }
+]
