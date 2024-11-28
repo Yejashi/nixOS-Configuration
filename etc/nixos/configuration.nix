@@ -13,12 +13,27 @@
   # Bootloader.
   #boot.loader.systemd-boot.enable = true;
   #boot.loader.efi.canTouchEfiVariables = true;
+#   boot = {
+#     loader = {
+#       sustemd-boot.enable = true;
+#       efi.canTouchEfiVariable = true;
+#     }
+#   }
+
   boot = {
+    # Get latest kernel
+    kernelPackages = pkgs.linuxPackages_latest;
+
+    initrd.kernelModules = ["amdgpu"];
+
     loader = {
-      sustemd-boot.enable = true;
-      efi.canTouchEfiVariable = true;
-    }
-  }
+        grub = {
+            # You can have at most 5 nixos configurations at a time
+            configurationLimit = 5;
+        };
+        timeout = 5;
+    };
+  };
 
   networking.hostName = "yejashi"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
