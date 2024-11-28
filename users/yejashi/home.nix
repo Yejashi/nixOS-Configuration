@@ -110,6 +110,7 @@
 
   programs.starship = {
     enable = true;
+    interactiveOnly = true;
     # Configuration written to ~/.config/starship.toml
     settings = {
       # add_newline = false;
