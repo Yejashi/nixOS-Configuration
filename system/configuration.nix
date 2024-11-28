@@ -141,7 +141,11 @@
      git
      sshfs
      gnome3.gnome-tweaks
+     # Gnome Extensions
      gnomeExtensions.blur-my-shell
+     gnomeExtensions.bluetooth-battery-meter
+     gnomeExtensions.just-perfection
+     gnomeExtensions.tray-icons-reloaded
      kitty
      xfce.thunar
      vscode
