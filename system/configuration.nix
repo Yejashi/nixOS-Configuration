@@ -146,7 +146,6 @@
     # Gnome Packages
     gnome3.gnome-tweaks
 
-
     # Icons + Themes
     tela-circle-icon-theme
     orchis-theme
