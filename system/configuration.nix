@@ -151,6 +151,7 @@
     gnomeExtensions.bluetooth-battery-meter
     gnomeExtensions.just-perfection
     gnomeExtensions.tray-icons-reloaded
+    gnomeExtensions.user-themes
 
     # Icons + Themes
     tela-circle-icon-theme
@@ -164,6 +165,13 @@
     input-remapper
     # Add zen-browser later on
   ];
+
+    programs.gnome = {
+        enable = true;
+        extensions = [
+            "blur-my-shell@aunetx "
+        ];
+    };
 
   # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
