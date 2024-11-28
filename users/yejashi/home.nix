@@ -152,6 +152,7 @@
         color-scheme = "prefer-dark";
     };
 
+    # TODO: Why doesn't close work???
     "org/gnome/desktop/wm/preferences" = {
         button-layout = "'appmenu:minimize,maximize,close'";
     };
