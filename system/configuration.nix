@@ -167,10 +167,11 @@
   ];
 
   dconf.settings = {
-    "org/gnome/shell" = {
-        disable-user-extensions = false;
-
-    };
+    "org/gnome/shell".enabled-extensions = (map (extension: extension.extensionUuid) home.packages)
+    ++
+    [
+      "user-theme@gnome-shell-extensions.gcampax.github.com"
+    ];
   };
 
   # TODO: Find a way to fix neofetch icons
