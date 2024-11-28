@@ -48,7 +48,6 @@
     foliate
     variety
     slack
-    input-remapper
     rofi
     fzf
     # starship

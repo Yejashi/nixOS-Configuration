@@ -134,26 +134,27 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-     wget
-     curl
-     zip
-     vim
-     git
-     sshfs
-     python312
-     python312Packages.pillow
-     gnome3.gnome-tweaks
-     # Gnome Extensions
-     gnomeExtensions.blur-my-shell
-     gnomeExtensions.bluetooth-battery-meter
-     gnomeExtensions.just-perfection
-     gnomeExtensions.tray-icons-reloaded
-     kitty
-     xfce.thunar
-     vscode
-     material-icons
-     starship
-     # Add zen-browser later on
+    wget
+    curl
+    zip
+    vim
+    git
+    sshfs
+    python312
+    python312Packages.pillow
+    gnome3.gnome-tweaks
+    # Gnome Extensions
+    gnomeExtensions.blur-my-shell
+    gnomeExtensions.bluetooth-battery-meter
+    gnomeExtensions.just-perfection
+    gnomeExtensions.tray-icons-reloaded
+    kitty
+    xfce.thunar
+    vscode
+    material-icons
+    starship
+    input-remapper
+    # Add zen-browser later on
   ];
 
   # TODO: Find a way to fix neofetch icons
@@ -181,6 +182,8 @@
 
     presets = [ "tokyo-night" ];
   };
+
+  services.inputRemapper.enable = true;
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
