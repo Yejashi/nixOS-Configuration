@@ -114,7 +114,7 @@
       source = ./config;
     };
 
-    ".ssh/variety/variety.conf" = {
+    ".config/variety/variety.conf" = {
       source = ./variety/variety.conf;
     };
 
