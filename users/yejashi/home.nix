@@ -100,19 +100,20 @@
     };
 
     # Make firefox look roundy, might i say ride eternal, shiny and chrome
-    ".mozilla/firefox/huuecasm.default/chrome" = {
-      source = ./chrome;
-      recursive = true;
-    };
+    # ".mozilla/firefox/huuecasm.default/chrome" = {
+    #   source = ./chrome;
+    #   recursive = true;
+    # };
+
+
+    # ".mozilla/firefox/*.default/user.js" = {
+    #   source = ./user.js;
+    # };
 
     "Documents/wallpapers/walls" = {
       source = ./walls;
       recursive = true;
     };
-
-    # ".mozilla/firefox/*.default/user.js" = {
-    #   source = ./user.js;
-    # };
 
     ".vimrc" = {
       source = ./.vimrc;
@@ -128,25 +129,6 @@
 
   };
 
-
-  home.activation.copyFirefoxConfigs = lib.mkAfter ''
-    for profile in ~/.mozilla/firefox/*.default; do
-      install -Dm644 ${./user.js} "$profile/user.js"
-      install -d "$profile/chrome"
-      install -d "$profile/chrome/fonts"
-      install -d "$profile/chrome/icons"
-      for file in ${./chrome}/*; do
-        install -m 644 "$file" "$profile/chrome/"
-      done
-      for file in ${./chrome}/fonts/*; do
-        install -m 644 "$file" "$profile/chrome/fonts/"
-        echo $file
-      done
-      for file in ${./chrome/icons}/*; do
-        install -m 644 "$file" "$profile/chrome/icons/"
-      done
-    done
-  '';
 
   dconf.settings = {
     # ...
