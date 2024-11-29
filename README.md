@@ -1,7 +1,7 @@
 It is the morning of Thanksgiving 2024. I wonder, as i write this, why i put myself through the suffering colloquially known as linux. Alas, pain begets progress and so i shall.
 
 ### Step 1
-Download the gnome [iso](https://github.com/Yejashi/nixOS-Configuration.git) and you know the rest.
+Download the gnome [iso](https://nixos.org/download/#nixos-iso) and you know the rest.
 
 ### Step 2
 Once you've booted into the OS then you need to temporarly aquire git as it is not installed by default. 
@@ -29,6 +29,8 @@ Now, its time to install any necessary packages and dot files using the home-man
 First, let's home-manager to the nix channels: `nix-channel --add https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz home-manager`
 
 Now update the channels: `nix-channel --update`
+
+Finally install: `nix-shell '<home-manager>' -A install`
 
 ### Step 7
 Now, let's begin the installation: `home-manager switch -f users/yejashi/home.nix`
