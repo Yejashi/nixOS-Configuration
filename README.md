@@ -40,4 +40,4 @@ Now, let's begin the installation: `home-manager switch -f users/yejashi/home.ni
 ### Step 8: Steps i haven't been able to add into the nixOS config yet.
 
 Add flathub repository:
-`flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+`sudo flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo`

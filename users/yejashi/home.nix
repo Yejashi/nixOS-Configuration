@@ -19,6 +19,7 @@
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+  programs.steam.enable = true
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
