@@ -190,7 +190,10 @@
 
   
   services.input-remapper.enable = true;
+
   services.flatpak.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal.config.common.default = "gtk";
 
 
   # This value determines the NixOS release from which the default
