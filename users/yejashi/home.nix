@@ -172,6 +172,11 @@
             name = "Orchis-Dark";
             package = pkgs.orchis-theme;
         };
+
+        iconTheme = {
+            name = "Tela-circle";
+            package = pkgs.tela-circle-icon-theme;
+        };
     };
 
   # TODO: What to do with this?
