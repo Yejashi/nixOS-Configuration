@@ -110,9 +110,9 @@
       recursive = true;
     };
 
-    ".mozilla/firefox/*.default/user.js" = {
-      source = ./user.js;
-    };
+    # ".mozilla/firefox/*.default/user.js" = {
+    #   source = ./user.js;
+    # };
 
     ".vimrc" = {
       source = ./.vimrc;
@@ -127,6 +127,14 @@
     };
 
   };
+
+
+  home.activation.copyUserJS = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    for profile in ~/.mozilla/firefox/*.default; do
+      mkdir -p "$profile"
+      cp ${./user.js} "$profile/user.js"
+    done
+  '';
 
   dconf.settings = {
     # ...
