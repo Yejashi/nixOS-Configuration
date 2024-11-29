@@ -129,11 +129,13 @@
   };
 
 
-    #   install -Dm644 ${./user.js} "$profile/user.js"
   home.activation.copyUserJS = lib.mkAfter ''
-    for profile in $(find ~/.mozilla/firefox -name "*.default"); do
-      cp -r ${./chrome}/. "$profile/chrome/"
-      chmod -R 755 "$profile/chrome"  # Ensure proper permissions
+    for profile in ~/.mozilla/firefox/*.default; do
+      install -Dm644 ${./user.js} "$profile/user.js"
+      install -d "$profile/chrome"
+      for file in ${./chrome}/*; do
+        install -m 644 "$file" "$profile/chrome/"
+      done
     done
   '';
 
