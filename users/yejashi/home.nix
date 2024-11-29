@@ -162,7 +162,7 @@
     };
 
     "/org/gnome/desktop/wm/keybindings" = {
-        "switch-to-workspace-left" = "<Control>x"
+        "switch-to-workspace-left" = "<Control>x";
     };
     
 
