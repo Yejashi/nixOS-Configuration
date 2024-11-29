@@ -127,6 +127,8 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+  services.input-remapper.enable = true;
+  services.flatpak.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -190,9 +192,6 @@
   };
 
   
-  services.input-remapper.enable = true;
-
-  services.flatpak.enable = true;
 
 #   services.flatpak.package = [
 #     "io.github.zen_browser.zen"
