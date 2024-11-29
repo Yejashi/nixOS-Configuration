@@ -192,6 +192,10 @@
   services.input-remapper.enable = true;
 
   services.flatpak.enable = true;
+  environment.variables.XDG_DATA_DIRS = lib.mkMerge [
+    "/var/lib/flatpak/exports/share"
+    "~/.local/share/flatpak/exports/share"
+  ];
 
 
   # This value determines the NixOS release from which the default
