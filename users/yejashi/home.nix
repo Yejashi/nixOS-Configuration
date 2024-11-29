@@ -161,9 +161,7 @@
         ];
     };
 
-    "/org/gnome/desktop/wm/keybindings/" = {
-        "switch-to-workspace-left" = "['<Super>Tab']";
-    };
+    "/org/gnome/desktop/wm/keybindings/switch-to-workspace-left" = "<Control>x']";
 
     # Custom Keybindings
     "org/gnome/settings-daemon/plugins/media-keys" = {
