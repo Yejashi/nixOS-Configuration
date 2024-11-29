@@ -154,18 +154,19 @@
         name = "Orchis-Dark";
     };
 
-    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings" = [
-        "custom0/"
-        "custom1/"
-    ];
-
-    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings" = {
-        "custom0" = {
-            name = "Rofi";
-            binding = "<Control>p";
-            command = "rofi -show drun";
-        };
+    "org/gnome/settings-daemon/plugins/media-keys" = {
+        custom-keybindings = [
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+        ];
     };
+
+    # "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings" = {
+    #     "custom0" = {
+    #         name = "Rofi";
+    #         binding = "<Control>p";
+    #         command = "rofi -show drun";
+    #     };
+    # };
   };
     
     # Legacy Application Theme
