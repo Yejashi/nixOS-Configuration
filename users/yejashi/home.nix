@@ -158,7 +158,7 @@
         "custom0" = {
             name = "Rofi";
             binding = "<Control>p";
-            command = "rofi -show drun"
+            command = "rofi -show drun";
         }:
     };
   };
