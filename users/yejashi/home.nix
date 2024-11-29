@@ -147,9 +147,6 @@
         "org.gnome.Nautilus.desktop"
       ];
 
-      "extensions/user-theme" = {
-        name = "Orchis-Dark";
-      };
     };
 
     "org/gnome/desktop/interface" = {
@@ -160,6 +157,11 @@
         button-layout = "appmenu:minimize,maximize,close";
         action-middle-click-titlebar = "minimize";
     };
+
+    "org/gnome/shell/extensions/user-theme" = {
+        name = "Orchis-Dark";
+    };
+
   };
     
     # Legacy Application Theme
