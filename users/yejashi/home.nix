@@ -34,6 +34,7 @@
     slack
     rofi
     fzf
+    cpu-x
     # starship
     ranger
     # vimPlugins.vim-plug
