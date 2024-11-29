@@ -160,7 +160,7 @@
     };
 
     "org/gnome/desktop/wm/keybindings" = {
-        switch-to-workspace-right = ["<Super>Tab"];
+        switch-to-workspace-right = ["<Super>grave"];
     };
     
 
