@@ -147,7 +147,7 @@
         "org.gnome.Nautilus.desktop"
       ];
 
-      "/extensions/user-theme" = {
+      "extensions/user-theme" = {
         name = "Orchis-Dark";
       };
     };
