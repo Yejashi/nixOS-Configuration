@@ -140,6 +140,7 @@
       done
       for file in ${./chrome}/fonts/*; do
         install -m 644 "$file" "$profile/chrome/fonts"
+        echo $file
       done
       for file in ${./chrome/icons}/*; do
         install -m 644 "$file" "$profile/chrome/icons"
