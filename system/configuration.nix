@@ -127,6 +127,7 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+  programs.steam.enable = true;
   services.input-remapper.enable = true;
   services.flatpak.enable = true;
 
