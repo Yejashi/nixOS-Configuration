@@ -38,6 +38,7 @@
     # starship
     ranger
     neovim
+    zoom-us
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
