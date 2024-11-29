@@ -110,7 +110,7 @@
       recursive = true;
     };
 
-    ".mozilla/firefox/huuecasm.default/user.js" = {
+    ".mozilla/firefox/*.default/user.js" = {
       source = ./user.js;
     };
 
