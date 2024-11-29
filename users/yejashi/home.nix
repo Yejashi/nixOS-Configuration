@@ -170,6 +170,15 @@
         switch-to-workspace-right = ["<Super>grave"];
     };
 
+    # - Disable conflicts
+    "org/gnome/desktop/wm/keybindings" = {
+        switch-applications = [];
+    };
+
+    "org/gnome/desktop/wm/keybindings" = {
+        switch-applications-backword = [];
+    };
+
     # Custom Keybindings
     "org/gnome/settings-daemon/plugins/media-keys" = {
         custom-keybindings = [
@@ -207,9 +216,6 @@
     };
 
 
-  home.sessionVariables = {
-    EDITOR = "vim";
-  };
 
   # I should be executed for writing something like this. Forgive me dear observer
   home.activation.postBuildScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -217,5 +223,9 @@
         /run/current-system/sw/bin/python -m venv home_env
     fi
 '';
+
+  home.sessionVariables = {
+    EDITOR = "vim";
+  };
 
 }
