@@ -159,7 +159,7 @@
             name = "Rofi";
             binding = "<Control>p";
             command = "rofi -show drun";
-        }:
+        };
     };
   };
     
