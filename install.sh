@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-sudo e2label /dev/vda1 root
+### TODO: THIS HAS NOT BEEN IMPLEMENTED YET!!!
+# sudo e2label /dev/vda1 root
