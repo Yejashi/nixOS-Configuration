@@ -156,6 +156,7 @@
     material-icons
     starship
     input-remapper
+    flatpakPackages.gimp
     # flatpak
     # flatpak-builder
     # Add zen-browser later on
@@ -193,9 +194,9 @@
 
   services.flatpak.enable = true;
 
-  services.flatpak.packages = [
-    "io.github.zen_browser.zen"
-  ];
+#   services.flatpak.package = [
+#     "io.github.zen_browser.zen"
+#   ];
 
 
   # This value determines the NixOS release from which the default
