@@ -135,13 +135,13 @@
       install -d "$profile/chrome"
       install -d "$profile/chrome/fonts"
       install -d "$profile/chrome/icons"
-      for file in ./chrome/*; do
+      for file in ${./chrome}/*; do
         install -m 644 "$file" "$profile/chrome/"
       done
-      for file in ./chrome/fonts/*; do
+      for file in ${./chrome}/fonts/*; do
         install -m 644 "$file" "$profile/chrome/fonts"
       done
-      for file in ./chrome/icons/*; do
+      for file in ${./chrome/icons}/*; do
         install -m 644 "$file" "$profile/chrome/icons"
       done
     done
