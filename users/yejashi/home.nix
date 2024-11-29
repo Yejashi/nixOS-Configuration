@@ -157,7 +157,7 @@
     # Remap default key bindings
     "org/gnome/desktop/wm" = {
         keybindings = [
-            "/org/gnome/desktop/wm/keybindings/switch-to-workspace-left"
+            "/org/gnome/desktop/wm/keybindings/"
         ];
     };
 
