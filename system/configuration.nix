@@ -158,7 +158,6 @@
     material-icons
     starship
     input-remapper
-    flatpakPackages.gimp
     # flatpak
     # flatpak-builder
     # Add zen-browser later on
