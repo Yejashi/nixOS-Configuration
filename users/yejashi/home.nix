@@ -160,10 +160,17 @@
         ];
     };
 
+    # Keybindings
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
         name = "Rofi";
         binding = "<Control>p";
         command = "rofi -show drun";
+    };
+
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
+        name = "Kitty";
+        binding = "<Super>Return";
+        command = "kitty --single-instance";
     };
   };
     
