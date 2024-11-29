@@ -122,6 +122,10 @@
       source = ./.bashrc;
     };
 
+    ".ssh/config" = {
+      source = ./config;
+    };
+
   };
 
   dconf.settings = {
