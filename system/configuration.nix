@@ -169,7 +169,7 @@
   fonts.packages = with pkgs; [
     source-code-pro
     noto-fonts
-    nerdfonts
+    # nerdfonts
     cantarell-fonts
     material-design-icons
     mononoki
