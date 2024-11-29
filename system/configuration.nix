@@ -152,11 +152,11 @@
     # Icons + Themes
     tela-circle-icon-theme
     orchis-theme
+    material-icons
     
     kitty
     xfce.thunar
     vscode
-    material-icons
     starship
     input-remapper
     # flatpak
@@ -170,6 +170,9 @@
     source-code-pro
     noto-fonts
     nerdfonts
+    cantarell-fonts
+    material-design-icons
+    mononoki
   ];
 
   # Can't do this in home-manager for some reason, bummer
