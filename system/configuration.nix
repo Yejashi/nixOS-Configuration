@@ -156,8 +156,8 @@
     material-icons
     starship
     input-remapper
-    flatpak
-    flatpak-builder
+    # flatpak
+    # flatpak-builder
     # Add zen-browser later on
   ];
 
@@ -190,7 +190,7 @@
 
   
   services.input-remapper.enable = true;
-
+  services.flatpak.enable = true;
 
 
   # This value determines the NixOS release from which the default
