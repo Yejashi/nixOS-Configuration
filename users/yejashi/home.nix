@@ -162,7 +162,7 @@
     };
 
     "/org/gnome/desktop/wm/keybindings/" = {
-        "switch-to-workspace-left" = "['<Super>Tab']"
+        "switch-to-workspace-left" = "['<Super>Tab']";
     };
 
     # Custom Keybindings
