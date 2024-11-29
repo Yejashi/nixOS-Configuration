@@ -154,13 +154,24 @@
         name = "Orchis-Dark";
     };
 
-    "org/gnome/settings-daemon/plugins/media-keys" = {
-        custom-keybindings = [
-        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+    # Remap default key bindings
+    "org/gnome/desktop/wm" = {
+        keybindings = [
+            "/org/gnome/desktop/wm/keybindings/switch-to-workspace-left"
         ];
     };
 
-    # Keybindings
+    "/org/gnome/desktop/wm/keybindings/" = {
+        "switch-to-workspace-left" = "['<Super>Tab']"
+    };
+
+    # Custom Keybindings
+    "org/gnome/settings-daemon/plugins/media-keys" = {
+        custom-keybindings = [
+            "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+        ];
+    };
+
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
         name = "Rofi";
         binding = "<Control>p";
