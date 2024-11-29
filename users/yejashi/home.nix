@@ -162,7 +162,6 @@
     "org/gnome/desktop/wm/keybindings" = {
         switch-to-workspace-right = ["<Super>grave"];
     };
-    
 
     # Custom Keybindings
     "org/gnome/settings-daemon/plugins/media-keys" = {
