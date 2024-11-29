@@ -39,6 +39,7 @@
     ranger
     neovim
     zoom-us
+    gdu
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
