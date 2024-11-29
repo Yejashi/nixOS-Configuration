@@ -135,7 +135,7 @@
 
       # `gnome-extensions list` for a list
       enabled-extensions = [
-        # "blur-my-shell@aunetx"
+        "blur-my-shell@aunetx"
         "Bluetooth-Battery-Meter@maniacx.github.com"
         "trayIconsReloaded@selfmade.pl"
         "just-perfection-desktop@just-perfection"

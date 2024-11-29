@@ -30,6 +30,8 @@ First, let's home-manager to the nix channels: `nix-channel --add https://github
 
 Now update the channels: `nix-channel --update`
 
+Now, log out and log back in.
+
 Finally install: `nix-shell '<home-manager>' -A install`
 
 ### Step 7
