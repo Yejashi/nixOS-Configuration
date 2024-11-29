@@ -133,6 +133,8 @@
     for profile in ~/.mozilla/firefox/*.default; do
       install -Dm644 ${./user.js} "$profile/user.js"
       install -d "$profile/chrome"
+      install -d "$profile/chrome/fonts"
+      install -d "$profile/chrome/icons"
       for file in ${./chrome}/*; do
         install -m 644 "$file" "$profile/chrome/"
       done
