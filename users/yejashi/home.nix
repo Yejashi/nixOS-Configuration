@@ -211,9 +211,10 @@
     EDITOR = "vim";
   };
 
+  # I should be executed for writing something like this. Forgive me dear observer
   home.activation.postBuildScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
     if [ ! -d "~/home_env" ]; then
-        python -m venv home_env
+        /run/current-system/sw/bin/python -m venv home_env
     fi
 '';
 
