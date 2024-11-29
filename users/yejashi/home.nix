@@ -175,6 +175,7 @@
         switch-applications = [];
     };
 
+    # This might be the incorrect invalidation
     "org/gnome/desktop/wm/keybindings" = {
         switch-applications-backword = [];
     };
