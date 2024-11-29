@@ -37,6 +37,7 @@
     cpu-x
     # starship
     ranger
+    neovim
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell

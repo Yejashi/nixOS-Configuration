@@ -72,7 +72,8 @@ set -o vi
 bind -m vi-command 'Control-l: clear-screen'
 bind -m vi-insert 'Control-l: clear-screen'
 
-# source ~/home_env/bin/activate  # commented out by conda initialize
+source ~/home_env/bin/activate
+
 #eval "$(starship init bash)"
 if [[ "$TERM" == "xterm-kitty" ]]; then
 	eval "$(starship init bash)"
