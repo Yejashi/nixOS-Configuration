@@ -129,7 +129,7 @@
   };
 
 
-  home.activation.copyUserJS = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.copyUserJS = lib.mkAfter ''
     for profile in ~/.mozilla/firefox/*.default; do
       mkdir -p "$profile"
       cp ${./user.js} "$profile/user.js"
