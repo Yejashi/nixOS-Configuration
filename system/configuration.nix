@@ -181,6 +181,7 @@
 
   # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
+    oranchelo-icon-theme
     source-code-pro
     noto-fonts
     nerdfonts
