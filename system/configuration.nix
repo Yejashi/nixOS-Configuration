@@ -167,7 +167,7 @@
     orchis-theme
     material-icons
     material-design-icons
-    oranchelo-icon-theme
+    # oranchelo-icon-theme
 
     kitty
     xfce.thunar
@@ -181,7 +181,7 @@
 
   # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
-    # oranchelo-icon-theme
+    oranchelo-icon-theme
     source-code-pro
     noto-fonts
     nerdfonts
