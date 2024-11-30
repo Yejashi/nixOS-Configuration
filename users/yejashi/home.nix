@@ -52,6 +52,7 @@
     gnomeExtensions.just-perfection
     gnomeExtensions.tray-icons-reloaded
     gnomeExtensions.user-themes
+    gnomeExtensions.quick-settings-audio-panel
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
