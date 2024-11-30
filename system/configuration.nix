@@ -15,6 +15,8 @@
     ./hardware-configuration.nix
   ];
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   boot = {
     # Get latest kernel
     kernelPackages = pkgs.linuxPackages_latest;
