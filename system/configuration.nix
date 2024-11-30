@@ -1,30 +1,116 @@
+let
+/*
+ * What you're seeing here is our nix formatter. It's quite opinionated:
+ */
+  sample-01 = { lib }:
+{
+  list = [
+    elem1
+    elem2
+    elem3
+  ] ++ lib.optionals stdenv.isDarwin [
+    elem4
+    elem5
+  ]; # and not quite finished
+}; # it will preserve your newlines
+
+  sample-02 = { stdenv, lib }:
+{
+  list =
+    [
+      elem1
+      elem2
+      elem3
+    ]
+    ++ lib.optionals stdenv.isDarwin [ elem4 elem5 ]
+    ++ lib.optionals stdenv.isLinux [ elem6 ]
+    ;
+};
+# but it can handle all nix syntax,
+# and, in fact, all of nixpkgs in <20s.
+# The javascript build is quite a bit slower.
+ sample-03 = { stdenv, system }:
+assert system == "i686-linux";
+stdenv.mkDerivation { };
+# these samples are all from https://github.com/nix-community/nix-fmt/tree/master/samples
+sample-simple = # Some basic formatting
+{
+  empty_list = [ ];
+  inline_list = [ 1 2 3 ];
+  multiline_list = [
+    1
+    2
+    3
+    4
+  ];
+  inline_attrset = { x = "y"; };
+  multiline_attrset = {
+    a = 3;
+    b = 5;
+  };
+  # some comment over here
+  fn = x: x + x;
+  relpath = ./hello;
+  abspath = /hello;
+  # URLs get converted from strings
+  url = "https://foobar.com";
+  atoms = [ true false null ];
+  # Combined
+  listOfAttrs = [
+    {
+      attr1 = 3;
+      attr2 = "fff";
+    }
+    {
+      attr1 = 5;
+      attr2 = "ggg";
+    }
+  ];
+
+  # long expression
+  attrs = {
+    attr1 = short_expr;
+    attr2 =
+      if true then big_expr else big_expr;
+  };
+}
+;
+in
+[ sample-01 sample-02 sample-03 ]
+  
+
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   boot = {
     # Get latest kernel
     kernelPackages = pkgs.linuxPackages_latest;
 
-    initrd.kernelModules = ["amdgpu"];
+    initrd.kernelModules = [ "amdgpu" ];
 
     loader = {
-        grub = {
-            enable = true;
-            devices = [ "/dev/vda" ];
-            useOSProber = true;
-            # You can have at most 5 nixos configurations at a time
-            configurationLimit = 5;
-        };
-        timeout = 5;
+      grub = {
+        enable = true;
+        devices = [ "/dev/vda" ];
+        useOSProber = true;
+        # You can have at most 5 nixos configurations at a time
+        configurationLimit = 5;
+      };
+      timeout = 5;
     };
   };
 
@@ -56,18 +142,17 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-
   services = {
     xserver = {
       # Enable the X11 windowing system.
       enable = true;
 
       displayManager = {
-	    gdm.enable = true;
+        gdm.enable = true;
       };
       desktopManager = {
         # Enable the GNOME Desktop Environment.
-	    gnome.enable = true;
+        gnome.enable = true;
       };
     };
   };
@@ -118,10 +203,17 @@
   users.users.yejashi = {
     isNormalUser = true;
     description = "yejashi";
-    extraGroups = [ "networkmanager" "wheel" "video" "storage" "network" "lp" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "video"
+      "storage"
+      "network"
+      "lp"
+    ];
     initialPassword = "password";
     packages = with pkgs; [
-    #  thunderbird
+      #  thunderbird
     ];
   };
 
@@ -153,7 +245,7 @@
     tela-circle-icon-theme
     orchis-theme
     material-icons
-    
+
     kitty
     xfce.thunar
     vscode
@@ -163,7 +255,6 @@
     # flatpak-builder
     # Add zen-browser later on
   ];
-
 
   # TODO: Find a way to fix neofetch icons
   fonts.packages = with pkgs; [
@@ -194,12 +285,9 @@
     presets = [ "tokyo-night" ];
   };
 
-  
-
-#   services.flatpak.package = [
-#     "io.github.zen_browser.zen"
-#   ];
-
+  #   services.flatpak.package = [
+  #     "io.github.zen_browser.zen"
+  #   ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

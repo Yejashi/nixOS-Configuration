@@ -1,4 +1,90 @@
-{ config, pkgs, lib, ... }:
+let
+/*
+ * What you're seeing here is our nix formatter. It's quite opinionated:
+ */
+  sample-01 = { lib }:
+{
+  list = [
+    elem1
+    elem2
+    elem3
+  ] ++ lib.optionals stdenv.isDarwin [
+    elem4
+    elem5
+  ]; # and not quite finished
+}; # it will preserve your newlines
+
+  sample-02 = { stdenv, lib }:
+{
+  list =
+    [
+      elem1
+      elem2
+      elem3
+    ]
+    ++ lib.optionals stdenv.isDarwin [ elem4 elem5 ]
+    ++ lib.optionals stdenv.isLinux [ elem6 ]
+    ;
+};
+# but it can handle all nix syntax,
+# and, in fact, all of nixpkgs in <20s.
+# The javascript build is quite a bit slower.
+ sample-03 = { stdenv, system }:
+assert system == "i686-linux";
+stdenv.mkDerivation { };
+# these samples are all from https://github.com/nix-community/nix-fmt/tree/master/samples
+sample-simple = # Some basic formatting
+{
+  empty_list = [ ];
+  inline_list = [ 1 2 3 ];
+  multiline_list = [
+    1
+    2
+    3
+    4
+  ];
+  inline_attrset = { x = "y"; };
+  multiline_attrset = {
+    a = 3;
+    b = 5;
+  };
+  # some comment over here
+  fn = x: x + x;
+  relpath = ./hello;
+  abspath = /hello;
+  # URLs get converted from strings
+  url = "https://foobar.com";
+  atoms = [ true false null ];
+  # Combined
+  listOfAttrs = [
+    {
+      attr1 = 3;
+      attr2 = "fff";
+    }
+    {
+      attr1 = 5;
+      attr2 = "ggg";
+    }
+  ];
+
+  # long expression
+  attrs = {
+    attr1 = short_expr;
+    attr2 =
+      if true then big_expr else big_expr;
+  };
+}
+;
+in
+[ sample-01 sample-02 sample-03 ]
+  
+
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
 
@@ -6,7 +92,6 @@
   # manage.
   home.username = "yejashi";
   home.homeDirectory = "/home/yejashi";
-
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -49,8 +134,6 @@
     gnomeExtensions.tray-icons-reloaded
     gnomeExtensions.user-themes
   ];
-
-  
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -96,7 +179,6 @@
     #   recursive = true;
     # };
 
-
     # ".mozilla/firefox/*.default/user.js" = {
     #   source = ./user.js;
     # };
@@ -122,9 +204,7 @@
       source = ./variety/variety.conf;
     };
 
-
   };
-
 
   dconf.settings = {
     # ...
@@ -152,81 +232,79 @@
     };
 
     "org/gnome/desktop/interface" = {
-        color-scheme = "prefer-dark";
+      color-scheme = "prefer-dark";
     };
 
     "org/gnome/desktop/wm/preferences" = {
-        button-layout = "appmenu:minimize,maximize,close";
-        action-middle-click-titlebar = "minimize";
+      button-layout = "appmenu:minimize,maximize,close";
+      action-middle-click-titlebar = "minimize";
     };
 
     "org/gnome/shell/extensions/user-theme" = {
-        name = "Orchis-Dark";
+      name = "Orchis-Dark";
     };
 
     # Remap default key bindings
     "org/gnome/desktop/wm/keybindings" = {
-        switch-to-workspace-left = ["<Super>Tab"];
+      switch-to-workspace-left = [ "<Super>Tab" ];
     };
 
     "org/gnome/desktop/wm/keybindings" = {
-        switch-to-workspace-right = ["<Super>grave"];
+      switch-to-workspace-right = [ "<Super>grave" ];
     };
 
     # - Disable conflicts
     "org/gnome/desktop/wm/keybindings" = {
-        switch-applications = [];
+      switch-applications = [ ];
     };
 
     # This might be the incorrect invalidation
     "org/gnome/desktop/wm/keybindings" = {
-        switch-applications-backword = [];
+      switch-applications-backword = [ ];
     };
 
     # Custom Keybindings
     "org/gnome/settings-daemon/plugins/media-keys" = {
-        custom-keybindings = [
-            "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
-            "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
-        ];
+      custom-keybindings = [
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/"
+        "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/"
+      ];
     };
 
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-        name = "Rofi";
-        binding = "<Control>p";
-        command = "rofi -show drun";
+      name = "Rofi";
+      binding = "<Control>p";
+      command = "rofi -show drun";
     };
 
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
-        name = "Kitty";
-        binding = "<Super>Return";
-        command = "kitty --single-instance";
+      name = "Kitty";
+      binding = "<Super>Return";
+      command = "kitty --single-instance";
     };
   };
-    
-    # Legacy Application Theme
-    gtk = {
-        enable = true;
 
-        theme = {
-            name = "Orchis-Dark";
-            package = pkgs.orchis-theme;
-        };
+  # Legacy Application Theme
+  gtk = {
+    enable = true;
 
-        iconTheme = {
-            name = "Tela-circle";
-            package = pkgs.tela-circle-icon-theme;
-        };
+    theme = {
+      name = "Orchis-Dark";
+      package = pkgs.orchis-theme;
     };
 
-
+    iconTheme = {
+      name = "Tela-circle";
+      package = pkgs.tela-circle-icon-theme;
+    };
+  };
 
   # I should be executed for writing something like this. Forgive me dear observer
-  home.activation.postBuildScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.postBuildScript = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "~/home_env" ]; then
         /run/current-system/sw/bin/python -m venv home_env
     fi
-'';
+  '';
 
   home.sessionVariables = {
     EDITOR = "vim";
