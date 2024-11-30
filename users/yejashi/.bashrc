@@ -42,7 +42,7 @@ alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-alias v="nvim"
+alias v="vim"
 alias r="ranger"
 alias enable-boost='sudo bash -c "echo 1 > /sys/devices/system/cpu/cpufreq/boost"'
 alias disable-boost='sudo bash -c "echo 0 > /sys/devices/system/cpu/cpufreq/boost"'
