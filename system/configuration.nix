@@ -167,6 +167,7 @@
     orchis-theme
     material-icons
     material-design-icons
+    oranchelo-icon-theme
 
     kitty
     xfce.thunar
@@ -184,7 +185,6 @@
     noto-fonts
     nerdfonts
     cantarell-fonts
-    material-design-icons
     mononoki
   ];
 
