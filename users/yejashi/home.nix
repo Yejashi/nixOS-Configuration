@@ -140,6 +140,7 @@
         "system-monitor@gnome-shell-extensions.gcampax.github.com"
         "user-theme@gnome-shell-extensions.gcampax.github.com"
         "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
+        "quick-settings-audio-panel@rayzeq.github.io"
       ];
 
       favorite-apps = [
