@@ -37,6 +37,8 @@ Finally install: `nix-shell '<home-manager>' -A install`
 ### Step 7
 Now, let's begin the installation: `home-manager switch -f users/yejashi/home.nix`
 
+***
+
 ### Step 8: Steps i haven't been able to add into the nixOS config yet.
 
 Add flathub repository:
