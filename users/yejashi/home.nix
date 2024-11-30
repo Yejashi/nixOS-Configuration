@@ -40,6 +40,7 @@
     neovim
     zoom-us
     gdu
+    obsidian
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
