@@ -53,6 +53,7 @@
     gnomeExtensions.tray-icons-reloaded
     gnomeExtensions.user-themes
     gnomeExtensions.quick-settings-audio-panel
+    linuxKernel.packages.linux_zen.cpupower
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -180,7 +181,6 @@
       switch-applications = [ ];
     };
 
-    # This might be the incorrect invalidation
     "org/gnome/desktop/wm/keybindings" = {
       switch-group = [ ];
     };
