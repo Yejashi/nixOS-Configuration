@@ -17,11 +17,11 @@ PS1='[\u@\h \W]\$ '
 [[ $- != *i* ]] && return
 
 if [ -d "$HOME/.bin" ]; then
-	PATH="$HOME/.bin:$PATH"
+    PATH="$HOME/.bin:$PATH"
 fi
 
 if [ -d "$HOME/.local/bin" ]; then
-	PATH="$HOME/.local/bin:$PATH"
+    PATH="$HOME/.local/bin:$PATH"
 fi
 
 #ignore upper and lowercase when TAB completion
@@ -42,7 +42,6 @@ alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-
 alias v="nvim"
 alias r="ranger"
 alias enable-boost='sudo bash -c "echo 1 > /sys/devices/system/cpu/cpufreq/boost"'
@@ -57,11 +56,11 @@ alias tellico-mnt='sshfs tellico:/home/bbogale ~/mount_point'
 alias tellico-unmount='fusermount -uz ~/mount_point'
 
 tellico-code() {
-	sshfs tellico:/home/bbogale/"$1" ~/mount_point && code ~/mount_point && exit
+    sshfs tellico:/home/bbogale/"$1" ~/mount_point && code ~/mount_point && exit
 }
 
 get-uni() {
-	echo -ne "\u"$1 | xclip -selection clipboard
+    echo -ne "\u"$1 | xclip -selection clipboard
 }
 
 vfzf() {
@@ -76,5 +75,5 @@ source ~/home_env/bin/activate
 
 #eval "$(starship init bash)"
 if [[ "$TERM" == "xterm-kitty" ]]; then
-	eval "$(starship init bash)"
+    eval "$(starship init bash)"
 fi
