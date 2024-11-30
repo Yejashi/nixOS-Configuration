@@ -160,11 +160,13 @@
 
     # Gnome Packages
     gnome3.gnome-tweaks
+    kitty-themes
 
     # Icons + Themes
     tela-circle-icon-theme
     orchis-theme
     material-icons
+    material-design-icons
 
     kitty
     xfce.thunar
