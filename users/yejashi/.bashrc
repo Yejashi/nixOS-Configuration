@@ -51,7 +51,7 @@ alias consmode='sudo cpupower frequency-set --governor conservative'
 alias set-governor='sudo cpupower frequency-set --governor '
 alias boost='cat /sys/devices/system/cpu/cpufreq/boost'
 alias governor='cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor'
-alias bashrc='nvim ~/.bashrc'
+alias bashrc='vim ~/.bashrc'
 alias tellico-mnt='sshfs tellico:/home/bbogale ~/mount_point'
 alias tellico-unmount='fusermount -uz ~/mount_point'
 
