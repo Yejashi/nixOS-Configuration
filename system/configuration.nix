@@ -154,6 +154,7 @@
     vim
     git
     sshfs
+    nix-ld
     python312
     python312Packages.pillow
 
