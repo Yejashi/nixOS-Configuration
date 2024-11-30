@@ -148,6 +148,7 @@
         "code.desktop"
         "spotify.desktop"
         "org.gnome.Nautilus.desktop"
+        "kitty.desktop"
       ];
 
     };
