@@ -50,7 +50,7 @@ Now, its time to install any necessary packages and dot files using the home-man
 
 First, let's home-manager to the nix channels: 
 ```
-nix-channel --add https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz home-manager
+nix-channel --add https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz home-manager
 ```
 
 Now update the channels: 
