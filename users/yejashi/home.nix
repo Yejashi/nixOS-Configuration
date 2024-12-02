@@ -45,6 +45,7 @@
     zoom-us
     gdu
     obsidian
+    openssl
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell

@@ -16,18 +16,21 @@
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+
 
   boot = {
     # Get latest kernel
     kernelPackages = pkgs.linuxPackages_latest;
 
-    initrd.kernelModules = [ "amdgpu" ];
+    #initrd.kernelModules = [ "nvidia" ];
+    #initrd.kernelModules = [ "amdgpu" ];
 
     loader = {
-      grub = {
+      systemd-boot = {
         enable = true;
-        devices = [ "/dev/vda" ];
-        useOSProber = true;
+        #devices = [ "/dev/vda" ];
+        #useOSProber = true;
         # You can have at most 5 nixos configurations at a time
         configurationLimit = 5;
       };
@@ -103,10 +106,10 @@
     #media-session.enable = true;
   };
 
-  sound = {
-    enable = true;
-    mediaKeys.enable = true;
-  };
+  #sound = {
+   # enable = true;
+    #mediaKeys.enable = true;
+  #};
 
   hardware.bluetooth = {
     enable = true;
@@ -161,7 +164,7 @@
     python312Packages.pillow
 
     # Gnome Packages
-    gnome3.gnome-tweaks
+    gnome.gnome-tweaks
     kitty-themes
 
     # Icons + Themes
@@ -220,6 +223,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
 }
