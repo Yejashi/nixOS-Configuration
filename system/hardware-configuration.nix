@@ -24,6 +24,11 @@
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
+  fileSystems."/home/yejashi/HDD" =
+    { device = "/dev/disk/by-uuid/319dd5d1-f950-4d4a-adb6-c1cb26a62be5";
+      fsType = "ext4";
+    };
+
   swapDevices =
     [ { device = "/dev/disk/by-uuid/36bfc92c-1025-41b6-8ba1-14d179bd2fde"; }
     ];
