@@ -46,6 +46,8 @@
     gdu
     obsidian
     openssl
+    lshw
+    inxi
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
