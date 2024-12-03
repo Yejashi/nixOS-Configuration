@@ -19,6 +19,7 @@
   # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
 
 
+
   boot = {
     # Get latest kernel
     kernelPackages = pkgs.linuxPackages_latest;
