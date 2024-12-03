@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 
@@ -48,6 +49,7 @@
     openssl
     lshw
     inxi
+    cava
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
@@ -58,6 +60,7 @@
     gnomeExtensions.quick-settings-audio-panel
     linuxKernel.packages.linux_zen.cpupower
   ];
+
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
