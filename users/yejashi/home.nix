@@ -28,12 +28,35 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # programs.spicetify =
+  #   let
+  #     spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+  #   in
+  #   {
+  #     enable = true;
+  #     enabledExtensions = with spicePkgs.extensions; [
+  #       adblock
+  #       hidePodcasts
+  #       shuffle # shuffle+ (special characters are sanitized out of extension names)
+  #     ];
+  #     theme = spicePkgs.themes.catppuccin;
+  #     colorScheme = "mocha";
+  #   };
+
+  imports = [
+    # For home-manager
+    inputs.spicetify-nix.homeManagerModules.default
+  ];
+
+  home.sessionVariables = {
+    EDITOR = "vim";
+  };
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
     htop
     neofetch
-    spotify
+    # spotify # It comes with spicetify?
     foliate
     variety
     slack
@@ -42,6 +65,7 @@
     cpu-x
     # starship
     ranger
+    discord
     neovim
     zoom-us
     gdu
@@ -50,6 +74,7 @@
     lshw
     inxi
     cava
+    btop
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
@@ -110,10 +135,10 @@
     #   source = ./user.js;
     # };
 
-    "Documents/wallpapers/walls" = {
-      source = ./walls;
-      recursive = true;
-    };
+    # "Documents/wallpapers/walls" = {
+    #   source = ./walls;
+    #   recursive = true;
+    # };
 
     ".vimrc" = {
       source = ./.vimrc;
@@ -234,8 +259,19 @@
     fi
   '';
 
-  home.sessionVariables = {
-    EDITOR = "vim";
-  };
+  programs.spicetify =
+    let
+      spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
+    in
+    {
+      enable = true;
+      enabledExtensions = with spicePkgs.extensions; [
+        shuffle # shuffle+ (special characters are sanitized out of extension names)
+      ];
+      theme = spicePkgs.themes.starryNight;
+      colorScheme = "mocha";
+    };
+
+
 
 }
