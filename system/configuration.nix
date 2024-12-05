@@ -6,6 +6,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 
@@ -233,6 +234,7 @@
     sshfs
     nix-ld
     python312
+    python312Packages.ipykernel
     python312Packages.pillow
 
     # Gnome Packages
@@ -251,6 +253,7 @@
     vscode
     starship
     input-remapper
+    inputs.zen-browser.packages."x86_64-linux".specific 
     # flatpak
     # flatpak-builder
     # Add zen-browser later on
