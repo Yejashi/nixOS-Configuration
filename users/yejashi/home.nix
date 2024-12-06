@@ -75,6 +75,10 @@
     inxi
     cava
     btop
+    plocate
+    nix-index
+    pciutils
+    mesa-demos
     # vimPlugins.vim-plug
     # Gnome Extensions
     gnomeExtensions.blur-my-shell
@@ -83,6 +87,7 @@
     gnomeExtensions.tray-icons-reloaded
     gnomeExtensions.user-themes
     gnomeExtensions.quick-settings-audio-panel
+    gnomeExtensions.forge
     linuxKernel.packages.linux_zen.cpupower
   ];
 
@@ -173,6 +178,7 @@
         "user-theme@gnome-shell-extensions.gcampax.github.com"
         "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
         "quick-settings-audio-panel@rayzeq.github.io"
+        "forge@jmmaranan.com"
       ];
 
       favorite-apps = [
@@ -234,6 +240,11 @@
       name = "Kitty";
       binding = "<Super>Return";
       command = "kitty --single-instance";
+    };
+
+    # GNOME Extensio Settings
+    "org/gnome/shell/extensions/forge" = {
+
     };
   };
 
