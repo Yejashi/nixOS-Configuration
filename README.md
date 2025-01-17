@@ -40,13 +40,8 @@ nixos-generate-config --show-hardware-config > system/hardware-configuration.nix
 
 Then generate the system:
 ```
-sudo nixos-rebuild switch -I nixos-config=./system/configuration.nix
-```
-
-```
 sudo nixos-rebuild switch --flake ./system
 ```
-
 
 This will install the system configurations.
 
@@ -55,7 +50,7 @@ Now, its time to install any necessary packages and dot files using the home-man
 
 First, let's home-manager to the nix channels: 
 ```
-nix-channel --add https://github.com/nix-community/home-manager/archive/release-24.11.tar.gz home-manager
+nix-channel --add https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz home-manager
 ```
 
 Now update the channels: 
@@ -73,12 +68,9 @@ nix-shell '<home-manager>' -A install
 ### Step 7
 Now, let's begin the installation: 
 ```
-home-manager switch -f users/yejashi/home.nix
-```
-
-```
 home-manager switch --flake ./system
 ```
+
 ***
 
 ### Steps i haven't been able to add into the nixOS config yet.
@@ -87,3 +79,4 @@ Add flathub repository:
 ```
 sudo flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 ```
+
