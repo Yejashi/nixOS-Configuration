@@ -40,7 +40,7 @@ nixos-generate-config --show-hardware-config > system/hardware-configuration.nix
 
 Then generate the system:
 ```
-sudo nixos-rebuild switch -I nixos-config=./system/configuration.nix
+sudo nixos-rebuild switch --flake ./system
 ```
 
 This will install the system configurations.
@@ -68,7 +68,7 @@ nix-shell '<home-manager>' -A install
 ### Step 7
 Now, let's begin the installation: 
 ```
-home-manager switch -f users/yejashi/home.nix
+home-manager switch --flake ./system
 ```
 
 ***
