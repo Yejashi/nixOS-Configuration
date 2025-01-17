@@ -27,7 +27,7 @@
 
     # initrd.kernelModules = [ "amdgpu" ];
 
-    initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+    initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "videodev" "uvcvideo"];
 
     loader = {
       systemd-boot = {
@@ -41,9 +41,6 @@
     };
   };
 
-  hardware.graphics = {
-    enable = true;
-  };
 
   # Uncomment for nvidia graphics
    hardware.nvidia = {
@@ -177,6 +174,8 @@
     #media-session.enable = true;
   };
 
+  hardware.enableAllFirmware = true;
+
   #sound = {
    # enable = true;
     #mediaKeys.enable = true;
@@ -212,6 +211,12 @@
     ];
   };
 
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    zlib 
+    libgcc  
+  ];
+
   # Install firefox.
   programs.firefox.enable = true;
   programs.steam.enable = true;
@@ -230,12 +235,20 @@
     zip
     vim
     git
+    usbutils
+    v4l-utils
     killall
+    linuxPackages.v4l2loopback
+    ffmpeg
     sshfs
     nix-ld
     python312
     python312Packages.ipykernel
     python312Packages.pillow
+    python312Packages.jupyter-core
+    virtualenv
+    gcc
+    conda
 
     # Gnome Packages
     gnome-tweaks
@@ -253,7 +266,7 @@
     vscode
     starship
     input-remapper
-    inputs.zen-browser.packages."x86_64-linux".specific 
+    inputs.zen-browser.packages."x86_64-linux".default 
     # flatpak
     # flatpak-builder
     # Add zen-browser later on
@@ -287,7 +300,15 @@
 
     presets = [ "tokyo-night" ];
   };
-
+  
+  systemd.user.services.custom_xset_service = {
+      description = "setting this so that the screen doesnt randomly turn off";
+      #serviceConfig.PassEnvironment = "DISPLAY";
+      script = ''
+        xset -dpms
+      '';
+      wantedBy = [ "multi-user.target" ];
+  };
   #   services.flatpak.package = [
   #     "io.github.zen_browser.zen"
   #   ];
