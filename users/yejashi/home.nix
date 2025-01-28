@@ -57,10 +57,11 @@
     htop
     neofetch
     # spotify # It comes with spicetify?
+    #spotify
     foliate
     variety
     slack
-    rofi
+    #rofi
     fzf
     cpu-x
     # starship
@@ -79,6 +80,11 @@
     nix-index
     pciutils
     mpv
+    git-lfs
+    waybar
+    rofi-wayland
+    swaybg
+    wlogout
     gimp-with-plugins
     libreoffice-qt6-fresh
     # vimPlugins.vim-plug
@@ -91,6 +97,7 @@
     gnomeExtensions.quick-settings-audio-panel
     gnomeExtensions.forge
     linuxKernel.packages.linux_zen.cpupower
+    viewnior
   ];
 
 
@@ -266,11 +273,11 @@
   };
 
   # I should be executed for writing something like this. Forgive me dear observer
-  home.activation.postBuildScript = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [ ! -d "~/home_env" ]; then
-        /run/current-system/sw/bin/python -m venv home_env
-    fi
-  '';
+# home.activation.postBuildScript = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+#   if [ ! -d "~/home_env" ]; then
+#       /run/current-system/sw/bin/python -m venv home_env
+#   fi
+# '';
 
   programs.spicetify =
     let
@@ -278,9 +285,6 @@
     in
     {
       enable = true;
-      enabledExtensions = with spicePkgs.extensions; [
-        shuffle # shuffle+ (special characters are sanitized out of extension names)
-      ];
       theme = spicePkgs.themes.starryNight;
       colorScheme = "mocha";
     };

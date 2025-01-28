@@ -145,6 +145,14 @@
             '';
         };
       };
+
+      windowManager.i3 = {
+        extraPackages = with pkgs; [
+          # Add pkgs here
+        ];
+
+      };
+      
     };
   };
 
@@ -210,6 +218,12 @@
       #  thunderbird
     ];
   };
+  
+  # Esoteric Crap Setup
+  programs.hyprland.enable = true;
+  services.xserver.windowManager.i3.enable = true;
+
+
 
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
@@ -233,6 +247,7 @@
     wget
     curl
     zip
+    unzip
     vim
     git
     usbutils
