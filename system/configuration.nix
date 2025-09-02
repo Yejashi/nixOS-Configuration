@@ -23,7 +23,8 @@
 
   boot = {
     # Get latest kernel
-    kernelPackages = pkgs.linuxPackages_latest;
+    #kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.linuxPackages_6_12;
 
     # initrd.kernelModules = [ "amdgpu" ];
 
@@ -83,7 +84,7 @@
 
      # Optionally, you may need to select the appropriate driver version for your specific GPU.
      # package = config.boot.kernelPackages.nvidiaPackages.stable;
-     package = config.boot.kernelPackages.nvidiaPackages.production;
+     package = config.boot.kernelPackages.nvidiaPackages.stable;
    };
 
   boot.blacklistedKernelModules = [
@@ -154,6 +155,12 @@
       };
       
     };
+
+    avahi = {
+        enable = true;
+        nssmdns4 = true;
+        openFirewall = true;
+    };
   };
 
 
@@ -220,8 +227,7 @@
   };
   
   # Esoteric Crap Setup
-  programs.hyprland.enable = true;
-  services.xserver.windowManager.i3.enable = true;
+  #services.xserver.windowManager.i3.enable = true;
 
 
 
@@ -261,9 +267,11 @@
     python312Packages.ipykernel
     python312Packages.pillow
     python312Packages.jupyter-core
+    python312Packages.cython
     virtualenv
     gcc
     conda
+    system-config-printer
 
     # Gnome Packages
     gnome-tweaks
@@ -276,6 +284,7 @@
     material-design-icons
     # oranchelo-icon-theme
 
+    gnumake
     kitty
     xfce.thunar
     vscode
