@@ -75,12 +75,12 @@
     lshw
     inxi
     cava
+    git-lfs
     btop
     plocate
     nix-index
     pciutils
     mpv
-    git-lfs
     waybar
     rofi-wayland
     swaybg
@@ -98,6 +98,18 @@
     gnomeExtensions.forge
     linuxKernel.packages.linux_zen.cpupower
     viewnior
+    glow
+    grip
+    graphviz
+    rustc
+    cargo
+    rustfmt
+    clippy
+    peek
+    spotify
+    thunderbird
+    mailspring
+    youtube-music
   ];
 
 
@@ -279,15 +291,14 @@
 #   fi
 # '';
 
-  programs.spicetify =
-    let
-      spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
-    in
-    {
-      enable = true;
-      theme = spicePkgs.themes.starryNight;
-      colorScheme = "mocha";
-    };
+# programs.spicetify =
+#   let
+#     spicePkgs = inputs.spicetify-nix.packages.${pkgs.system}.default;
+#   in
+#   {
+#     enable = true;
+#     theme = spicePkgs.themes.Default;
+#   };
 
     
 

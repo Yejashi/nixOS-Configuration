@@ -76,6 +76,20 @@ Host dane
   PubKeyAuthentication yes
   IdentityFile /home/yejashi/.ssh/id_ed25519.pub
 
+Host tuolumne
+  HostName tuolumne.llnl.gov
+  User bogale2
+  Port 22
+  PubKeyAuthentication yes
+  IdentityFile /home/yejashi/.ssh/id_ed25519.pub
+
+Host corona
+  HostName corona.llnl.gov
+  User bogale2
+  Port 22
+  PubKeyAuthentication yes
+  IdentityFile /home/yejashi/.ssh/id_ed25519.pub
+
 Host poodle
   HostName poodle.llnl.gov
   User bogale2
