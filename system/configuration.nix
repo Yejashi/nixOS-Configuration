@@ -17,7 +17,6 @@
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
 
 
 
@@ -26,13 +25,7 @@
     #kernelPackages = pkgs.linuxPackages_latest;
     kernelPackages = pkgs.linuxPackages_6_12;
 
-    # initrd.kernelModules = [ "amdgpu" ];
-
-    initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "videodev" "uvcvideo"];
-
-    kernelParams = [
-        "nvidia.NVreg_EnableGpuFirmware=0"
-    ];
+    initrd.kernelModules = [ "amdgpu" ];
 
     loader = {
       systemd-boot = {
@@ -47,60 +40,57 @@
   };
 
 
-  # Uncomment for nvidia graphics
-   hardware.nvidia = {
+  # Switched to AMD (RX 6750 XT) -- see hardware.graphics below. Left here
+  # in case of a future switch back to nvidia.
+  # hardware.nvidia = {
+  #
+  #   # Modesetting is required.
+  #   modesetting.enable = true;
+  #
+  #   nvidiaPersistenced = true;
+  #   # prime = {
+  #   #     offload.enable = true;
+  #   #     #sync.enable = true;
+  #
+  #   #     # amdgpuBusId = "PCI:5:0:0";
+  #
+  #   #     # nvidiaBusId = "PCI:1:0:0";
+  #   # };
+  #
+  #   # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
+  #   # Enable this if you have graphical corruption issues or application crashes after waking
+  #   # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
+  #   # of just the bare essentials.
+  #   powerManagement.enable = false;
+  #
+  #   # Fine-grained power management. Turns off GPU when not in use.
+  #   # Experimental and only works on modern Nvidia GPUs (Turing or newer).
+  #   # powerManagement.finegrained = false;
+  #
+  #   # Use the NVidia open source kernel module (not to be confused with the
+  #   # independent third-party "nouveau" open source driver).
+  #   # Support is limited to the Turing and later architectures. Full list of
+  #   # supported GPUs is at:
+  #   # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
+  #   # Only available from driver 515.43.04+
+  #   # Currently alpha-quality/buggy, so false is currently the recommended setting.
+  #   open = false;
+  #
+  #   # Enable the Nvidia settings menu,
+  #   # accessible via `nvidia-settings`.
+  #   nvidiaSettings = true;
+  #
+  #   # Optionally, you may need to select the appropriate driver version for your specific GPU.
+  #   package = config.boot.kernelPackages.nvidiaPackages.stable;
+  # };
 
-     # Modesetting is required.
-     modesetting.enable = true;
-
-     nvidiaPersistenced = true;
-     # prime = {
-     #     offload.enable = true;
-     #     #sync.enable = true;
-
-     #     # amdgpuBusId = "PCI:5:0:0";
-
-     #     # nvidiaBusId = "PCI:1:0:0";
-     # };
-
-     # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-     # Enable this if you have graphical corruption issues or application crashes after waking
-     # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead 
-     # of just the bare essentials.
-     powerManagement.enable = false;
-
-     # Fine-grained power management. Turns off GPU when not in use.
-     # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-     # powerManagement.finegrained = false;
-
-     # Use the NVidia open source kernel module (not to be confused with the
-     # independent third-party "nouveau" open source driver).
-     # Support is limited to the Turing and later architectures. Full list of 
-     # supported GPUs is at: 
-     # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
-     # Only available from driver 515.43.04+
-     # Currently alpha-quality/buggy, so false is currently the recommended setting.
-     open = false;
-
-     # Enable the Nvidia settings menu,
- 	# accessible via `nvidia-settings`.
-     nvidiaSettings = true;
-
-     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-     # package = config.boot.kernelPackages.nvidiaPackages.stable;
-     package = config.boot.kernelPackages.nvidiaPackages.stable;
-   };
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true; # needed for Steam/Proton (32-bit Vulkan/OpenGL)
+  };
 
 
 
-  boot.blacklistedKernelModules = [
-    "nouveau"
-    "rivafb"
-    "nvidiafb"
-    "rivatv"
-    "nv"
-    "uvcvideo"
-  ];
 
   networking.hostName = "yejashi"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -135,7 +125,7 @@
       # Enable the X11 windowing system.
       enable = true;
 
-      videoDrivers = [ "nvidia" ];
+      videoDrivers = [ "amdgpu" ];
 
       windowManager.i3 = {
         extraPackages = with pkgs; [
@@ -259,11 +249,6 @@
   documentation.doc.enable = false;
 
 
-  environment.sessionVariables = {
-      __GL_MaxFramesAllowed = "1";
-      __GL_YIELD = "USLEEP";
-  };
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -319,6 +304,7 @@
     source-code-pro
     noto-fonts
     nerd-fonts.symbols-only
+    nerd-fonts.fira-code
     cantarell-fonts
     mononoki
   ];
