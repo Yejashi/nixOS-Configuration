@@ -44,7 +44,6 @@
   #   };
 
   imports = [
-    # For home-manager
     inputs.spicetify-nix.homeManagerModules.default
   ];
 
@@ -55,9 +54,7 @@
   # environment.
   home.packages = with pkgs; [
     htop
-    neofetch
-    # spotify # It comes with spicetify?
-    #spotify
+    fastfetch
     foliate
     variety
     slack
@@ -82,7 +79,7 @@
     pciutils
     mpv
     waybar
-    rofi-wayland
+    rofi
     swaybg
     wlogout
     gimp-with-plugins
@@ -106,10 +103,13 @@
     rustfmt
     clippy
     peek
-    spotify
+    # spotify
     thunderbird
     mailspring
     youtube-music
+    ghostscript
+    xcolor
+    zotero
   ];
 
 
@@ -283,6 +283,29 @@
       package = pkgs.tela-circle-icon-theme;
     };
   };
+
+  # programs.elephant = {
+  #   enable = true;
+
+  #   installService = true;
+
+  #   package = inputs.elephant.packages.${pkgs.system}.default;
+  # };
+
+  # systemd.user.services.elephant.Unit.ConditionEnvironment = lib.mkForce "";
+    
+
+  # programs.walker = {
+  #   enable = true;
+  #   runAsService = true;
+
+  #   # Use the package from your flake input
+  #   package = inputs.walker.packages.${pkgs.system}.default;
+
+  #   # No custom configuration — let Walker use its defaults
+  #   # (this corresponds to its internal config.default.toml)
+  # };
+
 
   # I should be executed for writing something like this. Forgive me dear observer
 # home.activation.postBuildScript = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
