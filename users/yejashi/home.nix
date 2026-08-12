@@ -55,10 +55,10 @@
   home.packages = with pkgs; [
     htop
     fastfetch
+    playerctl
     foliate
     variety
     slack
-    #rofi
     fzf
     cpu-x
     # starship
@@ -79,7 +79,6 @@
     pciutils
     mpv
     waybar
-    rofi
     swaybg
     wlogout
     gimp-with-plugins
@@ -103,13 +102,15 @@
     rustfmt
     clippy
     peek
-    # spotify
+    spotify
     thunderbird
     mailspring
     youtube-music
     ghostscript
     xcolor
     zotero
+    walker
+    elephant
   ];
 
 
@@ -128,11 +129,6 @@
     # '';
     ".config/ranger" = {
       source = ./ranger;
-      recursive = true;
-    };
-
-    ".config/rofi" = {
-      source = ./rofi;
       recursive = true;
     };
 
@@ -252,9 +248,9 @@
     };
 
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
-      name = "Rofi";
+      name = "Walker";
       binding = "<Control>p";
-      command = "rofi -show drun";
+      command = "walker";
     };
 
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
@@ -282,29 +278,48 @@
       name = "Tela-circle";
       package = pkgs.tela-circle-icon-theme;
     };
+
+    # Orchis-Dark's GTK4 CSS hardcodes selectors into Nautilus's internal
+    # widget tree (e.g. placessidebar > scrolledwindow > viewport > row),
+    # which GNOME 50's Nautilus no longer matches -- causes a misaligned
+    # sidebar selection highlight. GTK4/libadwaita apps fall back to
+    # stock Adwaita instead of a possibly-incompatible custom theme.
+    gtk4.theme = null;
   };
 
-  # programs.elephant = {
-  #   enable = true;
+  # nixpkgs ships plain `walker`/`elephant` packages but no home-manager
+  # module (that only exists upstream, gated behind adding their flakes as
+  # inputs). Wire up the same systemd --user services their module would
+  # generate by hand instead of pulling in two more flake inputs.
+  systemd.user.services.elephant = {
+    Unit = {
+      Description = "Elephant launcher backend";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+    };
+    Service = {
+      ExecStart = "${pkgs.elephant}/bin/elephant";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
-  #   installService = true;
-
-  #   package = inputs.elephant.packages.${pkgs.system}.default;
-  # };
-
-  # systemd.user.services.elephant.Unit.ConditionEnvironment = lib.mkForce "";
-    
-
-  # programs.walker = {
-  #   enable = true;
-  #   runAsService = true;
-
-  #   # Use the package from your flake input
-  #   package = inputs.walker.packages.${pkgs.system}.default;
-
-  #   # No custom configuration — let Walker use its defaults
-  #   # (this corresponds to its internal config.default.toml)
-  # };
+  systemd.user.services.walker = {
+    Unit = {
+      Description = "Walker - Application Runner";
+      ConditionEnvironment = "WAYLAND_DISPLAY";
+      After = [ "graphical-session.target" "elephant.service" ];
+      Requires = [ "elephant.service" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.walker}/bin/walker --gapplication-service";
+      Restart = "on-failure";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
 
   # I should be executed for writing something like this. Forgive me dear observer
