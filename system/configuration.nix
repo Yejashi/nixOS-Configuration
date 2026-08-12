@@ -30,6 +30,10 @@
 
     initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "videodev" "uvcvideo"];
 
+    kernelParams = [
+        "nvidia.NVreg_EnableGpuFirmware=0"
+    ];
+
     loader = {
       systemd-boot = {
         enable = true;
@@ -87,6 +91,8 @@
      package = config.boot.kernelPackages.nvidiaPackages.stable;
    };
 
+
+
   boot.blacklistedKernelModules = [
     "nouveau"
     "rivafb"
@@ -131,29 +137,29 @@
 
       videoDrivers = [ "nvidia" ];
 
-      displayManager = {
-        gdm.enable = true;
-      };
-
-      desktopManager = {
-        # Enable the GNOME Desktop Environment.
-        gnome = {
-            enable = true;
-            extraGSettingsOverridePackages = [ pkgs.mutter ];
-            extraGSettingsOverrides = ''
-                [org.gnome.mutter]
-                edge-tiling=true
-            '';
-        };
-      };
-
       windowManager.i3 = {
         extraPackages = with pkgs; [
           # Add pkgs here
         ];
 
       };
-      
+
+    };
+
+    displayManager = {
+      gdm.enable = true;
+    };
+
+    desktopManager = {
+      # Enable the GNOME Desktop Environment.
+      gnome = {
+          enable = true;
+          extraGSettingsOverridePackages = [ pkgs.mutter ];
+          extraGSettingsOverrides = ''
+              [org.gnome.mutter]
+              edge-tiling=true
+          '';
+      };
     };
 
     avahi = {
@@ -161,6 +167,8 @@
         nssmdns4 = true;
         openFirewall = true;
     };
+
+    pulseaudio.enable = false;
   };
 
 
@@ -174,7 +182,6 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -246,6 +253,16 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # Broken upstream (sphinx build failure on python3.12's own docs as of
+  # nixos-26.05), and we don't use the HTML/info doc trees anyway. man
+  # pages (documentation.man.enable) are unaffected.
+  documentation.doc.enable = false;
+
+
+  environment.sessionVariables = {
+      __GL_MaxFramesAllowed = "1";
+      __GL_YIELD = "USLEEP";
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -286,12 +303,12 @@
 
     gnumake
     kitty
-    xfce.thunar
+    thunar
     vscode
     starship
     input-remapper
     inputs.zen-browser.packages."x86_64-linux".default 
-    # flatpak
+    flatpak
     # flatpak-builder
     # Add zen-browser later on
   ];
@@ -301,7 +318,7 @@
     oranchelo-icon-theme
     source-code-pro
     noto-fonts
-    nerdfonts
+    nerd-fonts.symbols-only
     cantarell-fonts
     mononoki
   ];
@@ -333,6 +350,7 @@
       '';
       wantedBy = [ "multi-user.target" ];
   };
+
   #   services.flatpak.package = [
   #     "io.github.zen_browser.zen"
   #   ];
