@@ -111,6 +111,7 @@
     zotero
     walker
     elephant
+    yazi
   ];
 
 

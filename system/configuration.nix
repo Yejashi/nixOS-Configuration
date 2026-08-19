@@ -327,6 +327,8 @@
 
     presets = [ "tokyo-night" ];
   };
+
+  services.gnome.gnome-browser-connector.enable = true;
   
   systemd.user.services.custom_xset_service = {
       description = "setting this so that the screen doesnt randomly turn off";
