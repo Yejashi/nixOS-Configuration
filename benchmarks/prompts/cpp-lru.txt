@@ -1,0 +1,10 @@
+Implement an LRU cache in modern C++17 using std::list and
+std::unordered_map.
+
+Include:
+- get()
+- put()
+- capacity handling, including capacity zero
+- complexity analysis
+
+Return compilable code followed by a concise explanation.

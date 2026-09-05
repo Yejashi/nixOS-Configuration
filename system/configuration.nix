@@ -155,10 +155,51 @@
     avahi = {
         enable = true;
         nssmdns4 = true;
-        openFirewall = true;
+        # Avoid advertising this workstation to the campus Wi-Fi network.
+        openFirewall = false;
     };
 
     pulseaudio.enable = false;
+  };
+
+  # Remote administration is available only through the private Tailscale
+  # interface. Tailscale's inbound UDP port remains closed; relayed connections
+  # are preferable to expanding the campus-network attack surface.
+  services.tailscale = {
+    enable = true;
+    openFirewall = false;
+  };
+
+  services.openssh = {
+    enable = true;
+    openFirewall = false;
+
+    settings = {
+      # The campus network cannot route directly to this private host. Tailscale
+      # provides the network boundary; SSH then authenticates the local account
+      # with its password.
+      PasswordAuthentication = true;
+      KbdInteractiveAuthentication = false;
+      PubkeyAuthentication = false;
+      AuthenticationMethods = "password";
+      PermitRootLogin = "no";
+      AllowUsers = [ "yejashi" ];
+
+      MaxAuthTries = 3;
+      LoginGraceTime = 30;
+      LogLevel = "VERBOSE";
+
+      X11Forwarding = false;
+      AllowAgentForwarding = false;
+      AllowTcpForwarding = "local";
+      GatewayPorts = "no";
+      PermitTunnel = "no";
+    };
+  };
+
+  networking.firewall = {
+    enable = true;
+    interfaces."tailscale0".allowedTCPPorts = [ 22 ];
   };
 
 
@@ -274,6 +315,13 @@
     gcc
     conda
     system-config-printer
+
+    # AMD Vulkan inference diagnostics and AppImage compatibility
+    vulkan-tools
+    mesa-demos
+    clinfo
+    nvtopPackages.amd
+    appimage-run
 
     # Gnome Packages
     gnome-tweaks

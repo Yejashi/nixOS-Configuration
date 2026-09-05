@@ -53,6 +53,14 @@
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    (writeShellScriptBin "lm-studio" ''
+      exec env -u ELECTRON_RUN_AS_NODE \
+        ${appimage-run}/bin/appimage-run \
+        /home/yejashi/HDD/AI/apps/LM-Studio-0.4.21-2-x64.AppImage "$@"
+    '')
+    (writeShellScriptBin "lms" ''
+      exec /home/yejashi/.lmstudio/bin/lms "$@"
+    '')
     htop
     fastfetch
     playerctl
@@ -69,6 +77,7 @@
     gdu
     obsidian
     openssl
+    opencode
     lshw
     inxi
     cava
@@ -112,7 +121,17 @@
     walker
     elephant
     yazi
+    vlc
   ];
+
+  xdg.desktopEntries.lm-studio = {
+    name = "LM Studio";
+    comment = "Run local language models";
+    exec = "lm-studio";
+    icon = "applications-development";
+    terminal = false;
+    categories = [ "Development" "Utility" ];
+  };
 
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -182,7 +201,13 @@
   };
 
   dconf.settings = {
-    # ...
+    # Keep the workstation reachable while it is plugged in. Manual suspend
+    # and hibernation remain available and will still make it unreachable.
+    "org/gnome/settings-daemon/plugins/power" = {
+      sleep-inactive-ac-type = "nothing";
+      sleep-inactive-ac-timeout = 0;
+    };
+
     "org/gnome/shell" = {
       disable-user-extensions = false;
 

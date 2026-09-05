@@ -1,0 +1,56 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "lmstudio/qwen3.5-9b-q5-k-m",
+  "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio (local Vulkan)",
+      "options": {
+        "baseURL": "http://127.0.0.1:1234/v1"
+      },
+      "models": {
+        "qwen3.5-9b-q5-k-m": {
+          "name": "Qwen3.5 9B Q5_K_M",
+          "limit": {
+            "context": 32768,
+            "output": 4096
+          }
+        },
+        "gemma-4-12b-q4-k-m": {
+          "name": "Gemma 4 12B Q4_K_M",
+          "limit": {
+            "context": 32768,
+            "output": 4096
+          }
+        },
+        "devstral-small-2-24b-iq3-m": {
+          "name": "Devstral Small 2 24B IQ3_M",
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          }
+        }
+      }
+    }
+  },
+  "permission": {
+    "*": "ask",
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "lsp": "allow",
+    "edit": "deny",
+    "task": "deny",
+    "webfetch": "deny",
+    "websearch": "deny",
+    "external_directory": "deny",
+    "bash": {
+      "*": "ask",
+      "git status *": "allow",
+      "git diff *": "allow",
+      "git log *": "allow",
+      "git rev-parse *": "allow",
+      "rg *": "allow"
+    }
+  }
+}

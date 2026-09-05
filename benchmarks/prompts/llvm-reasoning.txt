@@ -1,0 +1,6 @@
+Explain how an LLVM new-pass-manager Function pass can inspect LoadInst and
+StoreInst operations and classify memory accesses by pointer address space.
+
+Discuss opaque pointers and AMDGPU address spaces where relevant. Include a
+small, version-conscious C++ example and distinguish address-space
+classification from alias analysis.

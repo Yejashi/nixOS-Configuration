@@ -1,0 +1,51 @@
+Diagnose and fix the following C++17 program. Identify every correctness issue,
+make only necessary changes, and explain why the corrected iterator and map
+operations are safe.
+
+```cpp
+#include <iostream>
+#include <list>
+#include <unordered_map>
+
+class LRUCache {
+    using Entry = std::pair<int, int>;
+    std::size_t capacity_;
+    std::list<Entry> entries_;
+    std::unordered_map<int, std::list<Entry>::iterator> by_key_;
+
+public:
+    explicit LRUCache(std::size_t capacity) : capacity_(capacity) {}
+
+    int get(int key) {
+        auto it = by_key_[key];
+        if (it == entries_.end())
+            return -1;
+        entries_.splice(entries_.begin(), entries_, it);
+        return it->second;
+    }
+
+    void put(int key, int value) {
+        if (auto found = by_key_.find(key); found != by_key_.end()) {
+            entries_.erase(found->second);
+            entries_.push_front({key, value});
+            return;
+        }
+
+        entries_.push_front({key, value});
+        by_key_[key] = entries_.begin();
+        if (entries_.size() >= capacity_) {
+            entries_.pop_back();
+            by_key_.erase(entries_.back().first);
+        }
+    }
+};
+
+int main() {
+    LRUCache cache(2);
+    cache.put(1, 10);
+    cache.put(2, 20);
+    std::cout << cache.get(1) << '\n';
+    cache.put(3, 30);
+    std::cout << cache.get(2) << '\n';
+}
+```
