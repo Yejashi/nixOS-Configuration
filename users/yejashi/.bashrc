@@ -4,6 +4,13 @@ export VISUAL='vim'
 export HISTCONTROL=ignoreboth:erasedups
 #export PAGER='most'
 
+# Keep the API key outside this Git-managed file. OPENAI_KEY contains only the
+# raw key; command substitution removes its trailing newline.
+if [[ -r "$HOME/.config/OPENAI_KEY" ]]; then
+    OPENAI_API_KEY="$(< "$HOME/.config/OPENAI_KEY")"
+    export OPENAI_API_KEY
+fi
+
 #Ibus settings if you need them
 #type ibus-setup in terminal to change settings and start the daemon
 #delete the hashtags of the next lines and restart

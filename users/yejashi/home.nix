@@ -227,6 +227,7 @@
     ".config/opencode" = {
       source = ./opencode;
       recursive = true;
+      force = true;
     };
   };
 
