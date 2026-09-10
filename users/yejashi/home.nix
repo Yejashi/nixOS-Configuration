@@ -77,7 +77,33 @@
     gdu
     obsidian
     openssl
-    opencode
+    (symlinkJoin {
+      name = "opencode";
+      paths = [ opencode ];
+      buildInputs = [ makeWrapper ];
+      postBuild =
+        let
+          silenceHarnessMemoryLogs = writeShellScript "silence-harness-memory-logs" ''
+            cacheRoot="''${XDG_CACHE_HOME:-$HOME/.cache}/opencode/packages"
+
+            for pluginFile in "$cacheRoot"/harness-memory@*/node_modules/harness-memory/dist/plugin/index.js; do
+              [ -f "$pluginFile" ] || continue
+
+              if ${gnugrep}/bin/grep -Fq 'console.log(PLUGIN_LOG_PREFIX, ...args);' "$pluginFile"; then
+                ${gnused}/bin/sed -i \
+                  's/  console\.log(PLUGIN_LOG_PREFIX, \.\.\.args);/  return;/' \
+                  "$pluginFile"
+              fi
+            done
+          '';
+        in
+        ''
+          wrapProgram $out/bin/opencode \
+            --run ${silenceHarnessMemoryLogs} \
+            --prefix PATH : ${lib.makeBinPath [ nodejs ]} \
+            --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}
+        '';
+    })
     lshw
     inxi
     cava
@@ -198,6 +224,10 @@
       source = ./variety/variety.conf;
     };
 
+    ".config/opencode" = {
+      source = ./opencode;
+      recursive = true;
+    };
   };
 
   dconf.settings = {

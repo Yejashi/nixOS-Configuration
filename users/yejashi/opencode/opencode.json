@@ -1,0 +1,151 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "local": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local LLM",
+      "options": {
+        "baseURL": "http://127.0.0.1:8080/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "qwen3.6-35b-a3b": {
+          "name": "Qwen3.6 35B-A3B IQ4_XS 32k (local)",
+          "limit": {
+            "context": 32768,
+            "input": 24576,
+            "output": 8192
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "temperature": 0.7
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "balanced": {
+              "reasoningEffort": "medium"
+            },
+            "deep": {
+              "reasoningEffort": "high"
+            },
+            "off": {
+              "reasoningEffort": "none"
+            }
+          }
+        }
+      }
+    }
+  },
+  "model": "local/qwen3.6-35b-a3b",
+  "compaction": {
+    "prune": true,
+    "reserved": 8000,
+    "preserve_recent_tokens": 12000
+  },
+  "tool_output": {
+    "max_lines": 800,
+    "max_bytes": 24000
+  },
+  "lsp": {
+    "ruff": {
+      "command": ["ruff", "server"],
+      "extensions": [".py", ".pyi"]
+    },
+    "clangd": {
+      "command": ["clangd"],
+      "extensions": [".c", ".h", ".cc", ".cpp", ".cxx", ".hh", ".hpp", ".hxx", ".m", ".mm"]
+    },
+    "bash": {
+      "command": ["bash-language-server", "start"],
+      "extensions": [".sh", ".bash", ".bats"]
+    }
+  },
+  "agent": {
+    "raw": {
+      "description": "Unfiltered chat/creative writing. No coding-agent system prompt, no tools.",
+      "mode": "primary",
+      "model": "local/qwen3.6-35b-a3b",
+      "prompt": "{file:./prompts/raw.md}",
+      "tools": {
+        "bash": false,
+        "edit": false,
+        "write": false,
+        "read": false,
+        "grep": false,
+        "glob": false,
+        "list": false,
+        "patch": false,
+        "todowrite": false,
+        "todoread": false,
+        "webfetch": false,
+        "task": false,
+        "skill": false
+      }
+    },
+    "orchestrate": {
+      "description": "Plans and delegates; never edits. Use for large multi-file work that would otherwise fill the context window.",
+      "mode": "primary",
+      "prompt": "{file:./prompts/orchestrate.md}",
+      "tools": {
+        "bash": false,
+        "edit": false,
+        "write": false,
+        "patch": false,
+        "read": false,
+        "webfetch": false,
+        "glob": true,
+        "grep": true,
+        "task": true,
+        "todowrite": true
+      },
+      "steps": 200
+    },
+    "implementer": {
+      "description": "Executes one specific, already-decided code change. Reports FILES/CHANGES/VERIFIED/ISSUES.",
+      "mode": "subagent",
+      "prompt": "{file:./prompts/implementer.md}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "patch": true,
+        "glob": true,
+        "grep": true,
+        "bash": true,
+        "task": false,
+        "todowrite": false,
+        "webfetch": false
+      },
+      "steps": 100
+    },
+    "tester": {
+      "description": "Runs commands and reports pass/fail. Never edits files.",
+      "mode": "subagent",
+      "prompt": "{file:./prompts/tester.md}",
+      "tools": {
+        "bash": true,
+        "read": true,
+        "glob": true,
+        "grep": true,
+        "write": false,
+        "edit": false,
+        "patch": false,
+        "task": false,
+        "todowrite": false,
+        "webfetch": false
+      },
+      "steps": 30,
+      "permission": {
+        "skill": {
+          "*": "allow",
+          "opencode-ecosystem": "deny"
+        }
+      }
+    }
+  },
+  "plugin": [
+    "../../.cache/opencode/packages/harness-memory@0.5.1/node_modules/harness-memory/dist/plugin/index.js"
+  ]
+}
