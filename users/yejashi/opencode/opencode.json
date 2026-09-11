@@ -18,7 +18,7 @@
           "name": "Qwen3.6 35B-A3B IQ4_XS 128k (local)",
           "limit": {
             "context": 131072,
-            "output": 16384
+            "output": 32768
           },
           "options": {
             "reasoningEffort": "medium",
@@ -134,7 +134,7 @@
         "write": false,
         "patch": false,
         "read": false,
-        "webfetch": false,
+        "webfetch": true,
         "glob": true,
         "grep": true,
         "task": true,
@@ -148,8 +148,7 @@
           "operator": "allow",
           "tester": "allow"
         }
-      },
-      "steps": 500
+      }
     },
     "orchestrate-frontier": {
       "description": "Frontier orchestration: GPT-5.6 Terra plans and reviews while local workers execute.",
@@ -163,7 +162,7 @@
         "write": false,
         "patch": false,
         "read": false,
-        "webfetch": false,
+        "webfetch": true,
         "glob": true,
         "grep": true,
         "task": true,
@@ -177,8 +176,7 @@
           "operator": "allow",
           "tester": "allow"
         }
-      },
-      "steps": 500
+      }
     },
     "explore": {
       "description": "Local source browser for narrow code questions; cannot run shell commands or inspect Git state.",
@@ -197,7 +195,10 @@
         "todowrite": false,
         "webfetch": false
       },
-      "steps": 40
+      "permission": {
+        "doom_loop": "deny"
+      },
+      "steps": 100
     },
     "implementer": {
       "description": "Edits known files using file tools only; cannot run shell or Git commands.",
@@ -217,7 +218,10 @@
         "webfetch": false,
         "skill": false
       },
-      "steps": 60
+      "permission": {
+        "doom_loop": "deny"
+      },
+      "steps": 120
     },
     "operator": {
       "description": "Bash-only operator for exact state-changing shell commands, including Git staging, commits, and pushes.",
@@ -237,7 +241,10 @@
         "webfetch": false,
         "skill": false
       },
-      "steps": 30
+      "permission": {
+        "doom_loop": "deny"
+      },
+      "steps": 40
     },
     "tester": {
       "description": "Bash-only runner for read-only Git inspections, diagnostics, builds, and tests. Never edits files.",
@@ -257,7 +264,10 @@
         "webfetch": false,
         "skill": false
       },
-      "steps": 30
+      "permission": {
+        "doom_loop": "deny"
+      },
+      "steps": 100
     }
   },
   "plugin": [
