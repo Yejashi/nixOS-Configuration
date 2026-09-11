@@ -3,12 +3,17 @@
 OpenCode exposes two selectable primary agents:
 
 - `orchestrate-local` pins the orchestrator itself to the local Qwen model.
-- `orchestrate-frontier` uses the model selected through `/models`; select an
-  API-backed Anthropic or OpenAI model before using it.
+- `orchestrate-frontier` defaults to OpenAI GPT-5.6 Terra with medium reasoning.
 
-Both can delegate only to `explore`, `implementer`, and `tester`. All three
-workers are pinned to `local/qwen3.6-35b-a3b` at
+Both can delegate only to `explore`, `implementer`, `operator`, and `tester`.
+All four workers are pinned to `local/qwen3.6-35b-a3b` at
 `http://127.0.0.1:8080/v1`.
+
+Workers intentionally expose narrow tool sets: `explore` searches and reads,
+`implementer` edits known files, `tester` runs read-only Bash commands, and
+`operator` runs exact state-changing Bash commands such as Git commits and
+pushes. The local provider also disables parallel tool calls so every command
+result is observed before the model chooses its next action.
 
 OpenCode's title, summary, and compaction work is also pinned locally. The
 frontier API therefore receives the user conversation, worker instructions, and
@@ -33,21 +38,19 @@ Anthropic can be connected separately with `/connect` if desired.
 
 Start `opencode /path/to/project` and use the agent-switch key (Tab by default)
 to choose `orchestrate-local` or `orchestrate-frontier`. For the frontier option,
-run `/models` and select the desired API model.
+GPT-5.6 Terra with medium reasoning is selected by default. An explicit model
+selection can still override it for the current session.
 
 You can also select either profile at launch:
 
 ```sh
 opencode /path/to/project --agent orchestrate-local
-opencode /path/to/project --agent orchestrate-frontier --model provider/model-id
+opencode /path/to/project --agent orchestrate-frontier
 ```
 
 For a non-interactive task:
 
 ```sh
 opencode run --dir /path/to/project --agent orchestrate-frontier \
-  --model provider/model-id "Describe the task here"
+  "Describe the task here"
 ```
-
-Because the default model is local, `orchestrate-frontier` also falls back to
-Qwen until an API model is selected.
