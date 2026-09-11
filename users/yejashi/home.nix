@@ -151,6 +151,9 @@
     tmux
     jq
     claude-code
+    # CLI tools (llama-cli, llama-bench, ...) for poking at models by hand.
+    # The server itself runs from services.llama-cpp, not from here.
+    llama-cpp-vulkan
   ];
 
   xdg.desktopEntries.lm-studio = {

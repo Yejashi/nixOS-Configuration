@@ -36,6 +36,12 @@
         in
         {
           opencode = unstable.opencode;
+
+          # Stable's llama-cpp is built CPU-only (GGML_VULKAN=FALSE) and is
+          # ~1400 commits behind, missing flags this host's config relies on
+          # (--spec-type draft-mtp, --fit, --load-mode). The RX 6750 XT has
+          # no ROCm support in nixpkgs, so Vulkan is the only GPU backend.
+          llama-cpp-vulkan = unstable.llama-cpp-vulkan;
         };
     in
     {

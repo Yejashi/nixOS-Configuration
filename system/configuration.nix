@@ -385,8 +385,136 @@
     presets = [ "tokyo-night" ];
   };
 
+  # Local LLM inference server (Qwen3.6-35B-A3B MoE, IQ4_XS + Q8 MTP head)
+  # on the RX 6750 XT via Vulkan. Package comes from the unstable overlay in
+  # flake.nix -- see the comment there for why stable's llama-cpp won't do.
+  services.llama-cpp = {
+    enable = true;
+    package = pkgs.llama-cpp-vulkan;
+
+    # Deliberately NOT under ~/.local/share: the upstream module hardens the
+    # unit with DynamicUser + ProtectHome=true, so /home is invisible to the
+    # service. The model lives in /var/lib/llama-models instead.
+    model = "/var/lib/llama-models/Qwen3.6-35B-A3B-MTP-IMAT-IQ4_XS-Q8nextn.gguf";
+    host = "127.0.0.1";
+    port = 8080;
+
+    extraFlags = [
+      # 64K context at q8_0 KV costs the same VRAM as 128K at q4_0 but has
+      # half the cache error. Observed peak use is ~12K tokens, so the
+      # larger context was never actually being used.
+      "-c" "65536"
+      "-fa" "on"
+      "-ctk" "q8_0"
+      "-ctv" "q8_0"
+
+      # Whole transformer on the GPU; the experts of 27 MoE layers stay in
+      # system RAM so the remainder fits in 12GB of VRAM.
+      "-ngl" "999"
+      "--n-cpu-moe" "27"
+      "--load-mode" "none"
+      "--fit" "off"
+
+      # MTP-head speculative decoding, roughly 2x generation throughput
+      # (measured ~32 tok/s at 0.85 draft acceptance).
+      #
+      # CAVEAT: upstream issues #23335 / #23302 report that draft-mtp changes
+      # the committed token stream on Qwen3.6 MTP models, which speculative
+      # decoding is supposed to never do. Both are open and unconfirmed, and
+      # neither claims it causes degenerate output. Repeated identical
+      # requests here were byte-identical, so it looks well-behaved on this
+      # build -- but if looping ever comes back, drop these three lines
+      # first, before touching anything else.
+      "--spec-type" "draft-mtp"
+      "--spec-draft-n-max" "6"
+      "--spec-draft-p-min" "0.6"
+
+      "--jinja"
+      "--reasoning-preserve"
+
+      # Qwen3.6's published sampler spec for "thinking mode, precise coding"
+      # is temp 0.6 / top-p 0.95 / top-k 20 / min-p 0.0 / presence-penalty 0.
+      # top-k already arrives as 20 from the GGUF's own metadata, and
+      # presence-penalty is 0 by default -- note Qwen only recommends the
+      # aggressive presence-penalty 1.5 for general chat, NOT for coding.
+      # min-p is the one that does not match: llama.cpp defaults it to 0.05.
+      # That truncates every token below 5% of the top token's probability,
+      # which is exactly the tail DRY needs in order to push generation out
+      # of a repeat, so an established loop becomes self-reinforcing.
+      "--min-p" "0.0"
+      # OpenCode sends its own temperature per request, which overrides this;
+      # it only applies to clients that send none.
+      "--temp" "0.6"
+
+      # Anti-repetition sampling plus a deliberately small prompt cache.
+      # llama.cpp ships every repetition penalty disabled, and reusing slot
+      # KV state at the default 0.10 similarity drifts into degenerate
+      # output loops after long uptime. DRY only penalises continuing an
+      # 8+ token verbatim repeat, so repeated code lines are unaffected.
+      # DRY runs before the truncation samplers in the chain, so it gets to
+      # move probability mass before min-p/top-k cut the distribution.
+      "--dry-multiplier" "0.8"
+      "--dry-base" "1.75"
+      "--dry-allowed-length" "8"
+      "--dry-penalty-last-n" "4096"
+      "--cache-ram" "2048"
+      "--slot-prompt-similarity" "0.5"
+
+      "--parallel" "1"
+      # The Ryzen's 8 physical cores; SMT measured substantially slower for
+      # the CPU-resident MoE experts.
+      "--threads" "8"
+      "--metrics"
+      "--timeout" "0"
+    ];
+  };
+
+  systemd.services.llama-cpp = {
+    # ProtectHome=true also hides $HOME from RADV, which then fails to create
+    # its shader cache ("Permission denied---disabling") and recompiles every
+    # shader on each start. Point it at the unit's own CacheDirectory.
+    environment = {
+      HOME = "/var/lib/llama-cpp";
+      XDG_CACHE_HOME = "/var/cache/llama-cpp";
+    };
+    # Module default is 300s. Reloading an 18GB model is slow enough without
+    # waiting five minutes first.
+    serviceConfig.RestartSec = lib.mkForce 10;
+  };
+
+  # The degenerate-loop failure mode was only ever cured by a restart: after
+  # long uptime under OpenCode's 7 agents sharing one slot, trivial prompts
+  # started returning repeated `</think>` or verbatim echoes, and the very
+  # same prompts were fine again immediately after restarting. The other
+  # workstation never sees this because its router unloads the model after
+  # 300s idle, so it can't accumulate state in the first place. A nightly
+  # restart is the cheap equivalent -- the model reloads in ~21s.
+  # try-restart is a no-op when the service is already stopped.
+  systemd.services.llama-cpp-refresh = {
+    description = "Restart llama-cpp to clear accumulated slot/prompt-cache state";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.systemd}/bin/systemctl try-restart llama-cpp.service";
+    };
+  };
+
+  systemd.timers.llama-cpp-refresh = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "05:00";
+      RandomizedDelaySec = "15m";
+      # Don't fire a catch-up restart mid-session if the machine was asleep.
+      Persistent = false;
+    };
+  };
+
+  # Model store outside /home, readable by the unit's DynamicUser.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/llama-models 0755 root root -"
+  ];
+
   services.gnome.gnome-browser-connector.enable = true;
-  
+
   systemd.user.services.custom_xset_service = {
       description = "setting this so that the screen doesnt randomly turn off";
       #serviceConfig.PassEnvironment = "DISPLAY";
