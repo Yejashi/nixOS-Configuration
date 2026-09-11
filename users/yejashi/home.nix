@@ -108,7 +108,7 @@
     inxi
     cava
     git-lfs
-    btop
+    btop-rocm
     plocate
     nix-index
     pciutils
@@ -150,6 +150,7 @@
     vlc
     tmux
     jq
+    claude-code
   ];
 
   xdg.desktopEntries.lm-studio = {

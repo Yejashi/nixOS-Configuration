@@ -137,7 +137,13 @@
     };
 
     displayManager = {
-      gdm.enable = true;
+      gdm = {
+        enable = true;
+
+        # Keep the machine awake at the login screen so remote access
+        # remains available after reboot.
+        autoSuspend = false;
+      };
     };
 
     desktopManager = {
@@ -162,14 +168,17 @@
     pulseaudio.enable = false;
   };
 
-  # Remote administration is available only through the private Tailscale
-  # interface. Tailscale's inbound UDP port remains closed; relayed connections
-  # are preferable to expanding the campus-network attack surface.
+
   services.tailscale = {
     enable = true;
     openFirewall = false;
-  };
 
+    # Do not let Tailscale replace the system's DNS configuration.
+    # NetworkManager/DHCP should provide DNS for the active network.
+    extraSetFlags = [
+      "--accept-dns=false"
+    ];
+  };
   services.openssh = {
     enable = true;
     openFirewall = false;
