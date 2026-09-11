@@ -149,6 +149,7 @@
     yazi
     vlc
     tmux
+    jq
   ];
 
   xdg.desktopEntries.lm-studio = {
