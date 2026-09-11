@@ -127,6 +127,7 @@
       "description": "Fully local orchestration: Qwen plans and reviews while local workers execute.",
       "mode": "primary",
       "model": "local/qwen3.6-35b-a3b",
+      "reasoningEffort": "medium",
       "prompt": "{file:./prompts/orchestrate.md}",
       "tools": {
         "bash": false,
@@ -183,6 +184,7 @@
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
       "prompt": "You are a read-only local source browser. Answer one narrow codebase question for the orchestrator. Use glob and grep to locate relevant code, then read only the smallest set of files needed. You have no shell access: never claim to run or infer git status, git diff, git log, builds, tests, filesystem metadata, or any other command output. If asked for command-derived information, report that the task requires the tester worker. Do not redesign, edit, run commands, or delegate. Keep the entire response to at most fifteen lines. State the conclusion first, then only the paths, symbols, and short evidence needed for the next decision.",
+      "reasoningEffort": "low",
       "tools": {
         "read": true,
         "glob": true,
@@ -205,6 +207,7 @@
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
       "prompt": "{file:./prompts/implementer.md}",
+      "reasoningEffort": "low",
       "tools": {
         "read": true,
         "write": true,
@@ -251,6 +254,7 @@
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
       "prompt": "{file:./prompts/tester.md}",
+      "reasoningEffort": "low",
       "tools": {
         "bash": true,
         "read": false,
