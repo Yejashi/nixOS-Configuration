@@ -139,7 +139,8 @@
         "glob": true,
         "grep": true,
         "task": true,
-        "todowrite": true
+        "todowrite": true,
+        "skill": true
       },
       "permission": {
         "task": {
@@ -167,7 +168,8 @@
         "glob": true,
         "grep": true,
         "task": true,
-        "todowrite": true
+        "todowrite": true,
+        "skill": true
       },
       "permission": {
         "task": {
