@@ -22,8 +22,8 @@
           },
           "options": {
             "reasoningEffort": "medium",
-            "temperature": 0.7,
-            "parallel_tool_calls": false
+            "temperature": 0.4,
+            "parallel_tool_calls": true
           },
           "variants": {
             "low": {
@@ -198,7 +198,7 @@
       "permission": {
         "doom_loop": "deny"
       },
-      "steps": 100
+      "steps": 30
     },
     "implementer": {
       "description": "Edits known files using file tools only; cannot run shell or Git commands.",
@@ -221,7 +221,7 @@
       "permission": {
         "doom_loop": "deny"
       },
-      "steps": 120
+      "steps": 30
     },
     "operator": {
       "description": "Bash-only operator for exact state-changing shell commands, including Git staging, commits, and pushes.",
@@ -244,7 +244,7 @@
       "permission": {
         "doom_loop": "deny"
       },
-      "steps": 40
+      "steps": 30
     },
     "tester": {
       "description": "Bash-only runner for read-only Git inspections, diagnostics, builds, and tests. Never edits files.",
@@ -267,7 +267,7 @@
       "permission": {
         "doom_loop": "deny"
       },
-      "steps": 100
+      "steps": 30
     }
   },
   "plugin": [

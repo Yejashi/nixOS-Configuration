@@ -148,6 +148,7 @@
     elephant
     yazi
     vlc
+    tmux
   ];
 
   xdg.desktopEntries.lm-studio = {
