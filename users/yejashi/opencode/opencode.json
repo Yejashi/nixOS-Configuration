@@ -69,8 +69,8 @@
   "small_model": "local/qwen3.6-35b-a3b",
   "compaction": {
     "prune": true,
-    "reserved": 8000,
-    "preserve_recent_tokens": 12000
+    "reserved": 16384,
+    "preserve_recent_tokens": 8000
   },
   "tool_output": {
     "max_lines": 800,
