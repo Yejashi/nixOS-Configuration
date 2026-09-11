@@ -15,14 +15,15 @@
       },
       "models": {
         "qwen3.6-35b-a3b": {
-          "name": "Qwen3.6 35B-A3B IQ4_XS 128k (local)",
+          "name": "Qwen3.6 35B-A3B IQ4_XS 64k (local)",
           "limit": {
-            "context": 131072,
-            "output": 32768
+            "context": 65536,
+            "output": 16384
           },
           "options": {
             "reasoningEffort": "medium",
-            "temperature": 0.4,
+            "temperature": 0.7,
+            "top_p": 0.95,
             "parallel_tool_calls": true
           },
           "variants": {
@@ -53,11 +54,11 @@
         "qwen3.6-35b-a3b": {
           "name": "Qwen3.6 35B-A3B (short metadata)",
           "limit": {
-            "context": 131072,
-            "output": 256
+            "context": 65536,
+            "output": 512
           },
           "options": {
-            "reasoningEffort": "none",
+            "chat_template_kwargs": { "enable_thinking": false },
             "temperature": 0.2,
             "parallel_tool_calls": false
           }

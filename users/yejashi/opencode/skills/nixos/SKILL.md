@@ -598,15 +598,3 @@ Never ask operator to improvise after a failure.
 - Tailscale uses `--accept-dns=false`; DNS/network changes must account for that policy.
 - This machine is deliberately configured to remain reachable remotely instead of automatically suspending while plugged in or at the login screen. Do not undo that incidentally.
 
-## 16. Definition of done
-
-Report:
-
-- exact files changed;
-- why each change belongs to NixOS or Home Manager;
-- how package attributes or option paths were verified;
-- evaluation/build commands run and their results;
-- whether NixOS activation, Home Manager activation, or both are still required;
-- if activation was requested, which configuration was actually switched.
-
-Do not call a task successful merely because the edited Nix text looks plausible.
