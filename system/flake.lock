@@ -18,6 +18,22 @@
         "type": "github"
       }
     },
+    "hanabi": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788339085,
+        "narHash": "sha256-80NvalfP+kvWuGZCLno5mN4JMj5ei2jzcA4MBv+dPkU=",
+        "owner": "jeffshee",
+        "repo": "gnome-ext-hanabi",
+        "rev": "09da6255ffc3ade4c0aede9307ffa721a27ffa67",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jeffshee",
+        "repo": "gnome-ext-hanabi",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -110,6 +126,7 @@
     },
     "root": {
       "inputs": {
+        "hanabi": "hanabi",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",

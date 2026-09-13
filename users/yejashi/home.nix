@@ -120,6 +120,7 @@
     libreoffice-qt6-fresh
     # vimPlugins.vim-plug
     # Gnome Extensions
+    gnome-ext-hanabi
     gnomeExtensions.blur-my-shell
     gnomeExtensions.bluetooth-battery-meter
     gnomeExtensions.just-perfection
@@ -259,6 +260,7 @@
         "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
         "quick-settings-audio-panel@rayzeq.github.io"
         "forge@jmmaranan.com"
+        "hanabi-extension@jeffshee.github.io"
       ];
 
       favorite-apps = [

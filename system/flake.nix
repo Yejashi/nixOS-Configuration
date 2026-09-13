@@ -20,6 +20,11 @@
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
+    hanabi = {
+      url = "github:jeffshee/gnome-ext-hanabi";
+      flake = false;
+    };
+
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... }@inputs:
@@ -39,9 +44,11 @@
 
           # Stable's llama-cpp is built CPU-only (GGML_VULKAN=FALSE) and is
           # ~1400 commits behind, missing flags this host's config relies on
-          # (--fit, --load-mode). The RX 6750 XT has
+          # (--spec-type draft-mtp, --fit, --load-mode). The RX 6750 XT has
           # no ROCm support in nixpkgs, so Vulkan is the only GPU backend.
           llama-cpp-vulkan = unstable.llama-cpp-vulkan;
+
+          gnome-ext-hanabi = prev.callPackage ../users/yejashi/pkgs/hanabi.nix { src = inputs.hanabi; };
         };
     in
     {

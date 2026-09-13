@@ -351,6 +351,7 @@
     input-remapper
     inputs.zen-browser.packages."x86_64-linux".default 
     flatpak
+    gst_all_1.gst-plugins-rs
     # flatpak-builder
     # Add zen-browser later on
   ];
@@ -415,23 +416,24 @@
       "--load-mode" "none"
       "--fit" "off"
 
-      # MTP-head speculative decoding is DISABLED (2026-09-13). It was worth
-      # roughly 2x generation throughput (~32 tok/s at 0.85 draft acceptance)
-      # via:
+      # MTP-head speculative decoding, roughly 2x generation throughput
+      # (19 tok/s measured without it, ~32 tok/s with, at 0.85 draft
+      # acceptance).
       #
-      #   "--spec-type" "draft-mtp"
-      #   "--spec-draft-n-max" "6"
-      #   "--spec-draft-p-min" "0.6"
+      # These were briefly removed on 2026-09-13 while chasing agent
+      # "looping", on the theory that upstream issues #23335 / #23302
+      # (draft-mtp altering the committed token stream on Qwen3.6 MTP
+      # models) explained it. They did not: the culprit was the DRY sampler
+      # corrupting verbatim-repeated file paths -- see the DRY note below.
+      # Removing MTP alone did NOT stop the corruption; removing DRY did.
+      # Restored here once DRY-off was confirmed clean over a real session.
       #
-      # but looping came back -- OpenCode sub-agents retrying the same action
-      # over and over -- which is the failure mode upstream issues #23335 /
-      # #23302 hint at: draft-mtp changing the committed token stream on
-      # Qwen3.6 MTP models, which speculative decoding is supposed to never
-      # do. Byte-identical repeated requests were not enough to clear it.
-      # Don't restore these without checking those issues are fixed.
-      #
-      # The model file is still the Q8 MTP-head quant; the head is simply
-      # unused now, which costs a little VRAM but nothing else.
+      # #23335 / #23302 are still open and unconfirmed, so if token-stream
+      # weirdness ever appears that DRY does not explain, these are still
+      # the first three lines to pull.
+      "--spec-type" "draft-mtp"
+      "--spec-draft-n-max" "6"
+      "--spec-draft-p-min" "0.6"
 
       "--jinja"
       "--reasoning-preserve"
@@ -475,8 +477,17 @@
       # only variable: DRY on reproduced the path exactly 0/3 times with
       # miscased segments every trial; DRY off, 3/3 exact and 0 corruption.
       #
-      # This -- not draft-mtp -- is the likeliest cause of the original
-      # degenerate loops too, since DRY was added to cure them.
+      # Confirmed in a real OpenCode session: with DRY off (and MTP still
+      # off at that point) the corruption stopped, which is what cleared
+      # draft-mtp and let it be restored above. DRY was originally added to
+      # cure "degenerate loops", so it was most likely causing the thing it
+      # was meant to fix.
+      #
+      # Do not reintroduce ANY repetition penalty here (DRY, repeat-penalty,
+      # presence-penalty). Agents must emit identical paths, identifiers and
+      # tool names constantly; penalising verbatim repeats is actively wrong
+      # for this workload. Qwen's own spec says presence-penalty 1.5 is for
+      # general chat and NOT for coding, for the same reason.
       "--cache-ram" "2048"
       "--slot-prompt-similarity" "0.5"
 
