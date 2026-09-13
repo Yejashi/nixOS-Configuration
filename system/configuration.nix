@@ -415,19 +415,23 @@
       "--load-mode" "none"
       "--fit" "off"
 
-      # MTP-head speculative decoding, roughly 2x generation throughput
-      # (measured ~32 tok/s at 0.85 draft acceptance).
+      # MTP-head speculative decoding is DISABLED (2026-09-13). It was worth
+      # roughly 2x generation throughput (~32 tok/s at 0.85 draft acceptance)
+      # via:
       #
-      # CAVEAT: upstream issues #23335 / #23302 report that draft-mtp changes
-      # the committed token stream on Qwen3.6 MTP models, which speculative
-      # decoding is supposed to never do. Both are open and unconfirmed, and
-      # neither claims it causes degenerate output. Repeated identical
-      # requests here were byte-identical, so it looks well-behaved on this
-      # build -- but if looping ever comes back, drop these three lines
-      # first, before touching anything else.
-      "--spec-type" "draft-mtp"
-      "--spec-draft-n-max" "6"
-      "--spec-draft-p-min" "0.6"
+      #   "--spec-type" "draft-mtp"
+      #   "--spec-draft-n-max" "6"
+      #   "--spec-draft-p-min" "0.6"
+      #
+      # but looping came back -- OpenCode sub-agents retrying the same action
+      # over and over -- which is the failure mode upstream issues #23335 /
+      # #23302 hint at: draft-mtp changing the committed token stream on
+      # Qwen3.6 MTP models, which speculative decoding is supposed to never
+      # do. Byte-identical repeated requests were not enough to clear it.
+      # Don't restore these without checking those issues are fixed.
+      #
+      # The model file is still the Q8 MTP-head quant; the head is simply
+      # unused now, which costs a little VRAM but nothing else.
 
       "--jinja"
       "--reasoning-preserve"
@@ -438,25 +442,41 @@
       # presence-penalty is 0 by default -- note Qwen only recommends the
       # aggressive presence-penalty 1.5 for general chat, NOT for coding.
       # min-p is the one that does not match: llama.cpp defaults it to 0.05.
-      # That truncates every token below 5% of the top token's probability,
-      # which is exactly the tail DRY needs in order to push generation out
-      # of a repeat, so an established loop becomes self-reinforcing.
+      # 0.0 is what Qwen publishes, so it stays -- but note the original
+      # justification for it (leaving tail mass available for DRY to escape
+      # a repeat) is void now that DRY is off, and that same tail is what
+      # let DRY's miscased path variants get sampled. If path corruption is
+      # ever seen again with DRY already off, try 0.05 here next.
       "--min-p" "0.0"
       # OpenCode sends its own temperature per request, which overrides this;
       # it only applies to clients that send none.
       "--temp" "0.6"
 
-      # Anti-repetition sampling plus a deliberately small prompt cache.
-      # llama.cpp ships every repetition penalty disabled, and reusing slot
-      # KV state at the default 0.10 similarity drifts into degenerate
-      # output loops after long uptime. DRY only penalises continuing an
-      # 8+ token verbatim repeat, so repeated code lines are unaffected.
-      # DRY runs before the truncation samplers in the chain, so it gets to
-      # move probability mass before min-p/top-k cut the distribution.
-      "--dry-multiplier" "0.8"
-      "--dry-base" "1.75"
-      "--dry-allowed-length" "8"
-      "--dry-penalty-last-n" "4096"
+      # DRY is DISABLED (2026-09-13). It was:
+      #
+      #   "--dry-multiplier" "0.8"
+      #   "--dry-base" "1.75"
+      #   "--dry-allowed-length" "8"
+      #   "--dry-penalty-last-n" "4096"
+      #
+      # The old note here claimed "repeated code lines are unaffected"
+      # because DRY only penalises an 8+ token verbatim repeat. That
+      # reasoning is wrong for agent workloads: an absolute path like
+      # /home/yejashi/Documents/repos/nixOS-Configuration/users/yejashi/home.nix
+      # is ~20 tokens and a coding agent reproduces it verbatim on every
+      # tool call, so within a few calls it becomes exactly the pattern DRY
+      # suppresses. It then corrupts the path -- observed: Users, USERS,
+      # nixOS-CONFIGURATION, Configurations, NixOS-Confguration -- the read
+      # fails, the agent retries, and that retry storm is the "looping".
+      # min-p 0.0 below made it worse by leaving the miscased variants in
+      # the distribution for sampling.
+      #
+      # A/B measured over a 25-message transcript, 3 trials, sampler as the
+      # only variable: DRY on reproduced the path exactly 0/3 times with
+      # miscased segments every trial; DRY off, 3/3 exact and 0 corruption.
+      #
+      # This -- not draft-mtp -- is the likeliest cause of the original
+      # degenerate loops too, since DRY was added to cure them.
       "--cache-ram" "2048"
       "--slot-prompt-similarity" "0.5"
 
