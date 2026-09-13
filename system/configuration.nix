@@ -208,7 +208,11 @@
 
   networking.firewall = {
     enable = true;
-    interfaces."tailscale0".allowedTCPPorts = [ 22 ];
+    # 22: SSH. 3389: GNOME Remote Login (system daemon, headless session).
+    # 3390: GNOME Desktop Sharing (user daemon, mirrors the seat0 session) --
+    # moved off the default because both backends bind 3389 otherwise.
+    # All reachable only over Tailscale; the campus network cannot route here.
+    interfaces."tailscale0".allowedTCPPorts = [ 22 3389 3390 ];
   };
 
 
@@ -545,6 +549,34 @@
   ];
 
   services.gnome.gnome-browser-connector.enable = true;
+
+  # Remote desktop over RDP. Enables both the system daemon (Remote Login:
+  # headless GDM-managed session, no console login required) and the user
+  # daemon (Desktop Sharing: mirrors the active session on seat0).
+  services.gnome.gnome-remote-desktop.enable = true;
+
+  # "grdctl --system rdp enable" enables the unit over D-Bus (EnableUnitFiles),
+  # which writes to /etc/systemd/system/graphical.target.wants -- a read-only
+  # store symlink here, so it always fails on NixOS. Wire the Remote Login
+  # daemons into graphical.target declaratively for the same runtime effect.
+  systemd.services.gnome-remote-desktop.wantedBy = [ "graphical.target" ];
+  systemd.services.gnome-remote-desktop-configuration.wantedBy = [ "graphical.target" ];
+
+  # MANUAL POST-INSTALL STEP -- Remote Login needs state that lives outside the
+  # flake, in /var/lib/gnome-remote-desktop. grdctl is the only way to set it,
+  # so a fresh install of this config starts with the system daemon running but
+  # RDP *disabled*: it binds no port and 3389 silently refuses connections,
+  # while Desktop Sharing on 3390 keeps working and hides the problem. Logging
+  # out then strands the machine, since 3390 dies with the session it mirrors.
+  #
+  #   sudo grdctl --system rdp set-credentials <user> <password>
+  #   sudo grdctl --system rdp enable
+  #   sudo systemctl restart gnome-remote-desktop
+  #
+  # Verify with "ss -tln | grep 3389" before relying on it. The wantedBy above
+  # only starts the daemon; it does not flip the enabled flag these commands do.
+  # Both print a benign "Init TPM credentials failed ... using GKeyFile as
+  # fallback" warning on hardware without a usable TPM.
 
   systemd.user.services.custom_xset_service = {
       description = "setting this so that the screen doesnt randomly turn off";

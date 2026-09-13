@@ -246,6 +246,17 @@
       sleep-inactive-ac-timeout = 0;
     };
 
+    # GNOME Desktop Sharing refuses to attach to a locked session ("Session
+    # creation inhibited"), so a lock screen strands remote access until
+    # someone runs `loginctl unlock-session` over SSH.
+    "org/gnome/desktop/screensaver" = {
+      lock-enabled = false;
+    };
+
+    "org/gnome/desktop/session" = {
+      idle-delay = lib.hm.gvariant.mkUint32 0;
+    };
+
     "org/gnome/shell" = {
       disable-user-extensions = false;
 
