@@ -12,8 +12,10 @@ All four workers are pinned to `local/qwen3.6-35b-a3b` at
 Workers intentionally expose narrow tool sets: `explore` searches and reads,
 `implementer` edits known files, `tester` runs read-only Bash commands, and
 `operator` runs exact state-changing Bash commands such as Git commits and
-pushes. The local provider also disables parallel tool calls so every command
-result is observed before the model chooses its next action.
+pushes. The backend runs `--parallel 1`, so both orchestrators set
+`parallel_tool_calls: false` and dispatch workers one at a time.
+
+`frontier-implementer` shares the implementer contract but runs on the frontier model, for units dominated by writing prose; titles run on a separate 4B server at `http://127.0.0.1:8081/v1` so they stop evicting the 35B's slot.
 
 OpenCode's title, summary, and compaction work is also pinned locally. The
 frontier API therefore receives the user conversation, worker instructions, and

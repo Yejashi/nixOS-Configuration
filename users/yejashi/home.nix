@@ -6,6 +6,42 @@
   ...
 }:
 
+let
+  # Lifted out of home.packages so systemd.user.services.opencode-server can
+  # point at the same wrapped derivation rather than whatever happens to be on
+  # PATH. The wrapper matters for the service too: it puts nodejs on PATH for
+  # the language servers opencode spawns.
+  opencodeWrapped =
+    with pkgs;
+    symlinkJoin {
+      name = "opencode";
+      paths = [ opencode ];
+      buildInputs = [ makeWrapper ];
+      postBuild =
+        let
+          silenceHarnessMemoryLogs = writeShellScript "silence-harness-memory-logs" ''
+            cacheRoot="''${XDG_CACHE_HOME:-$HOME/.cache}/opencode/packages"
+
+            for pluginFile in "$cacheRoot"/harness-memory@*/node_modules/harness-memory/dist/plugin/index.js; do
+              [ -f "$pluginFile" ] || continue
+
+              if ${gnugrep}/bin/grep -Fq 'console.log(PLUGIN_LOG_PREFIX, ...args);' "$pluginFile"; then
+                ${gnused}/bin/sed -i \
+                  's/  console\.log(PLUGIN_LOG_PREFIX, \.\.\.args);/  return;/' \
+                  "$pluginFile"
+              fi
+            done
+          '';
+        in
+        ''
+          wrapProgram $out/bin/opencode \
+            --run ${silenceHarnessMemoryLogs} \
+            --prefix PATH : ${lib.makeBinPath [ nodejs ]} \
+            --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}
+        '';
+    };
+in
+
 {
 
   # Home Manager needs a bit of information about you and the paths it should
@@ -77,33 +113,24 @@
     gdu
     obsidian
     openssl
-    (symlinkJoin {
-      name = "opencode";
-      paths = [ opencode ];
-      buildInputs = [ makeWrapper ];
-      postBuild =
-        let
-          silenceHarnessMemoryLogs = writeShellScript "silence-harness-memory-logs" ''
-            cacheRoot="''${XDG_CACHE_HOME:-$HOME/.cache}/opencode/packages"
+    opencodeWrapped
 
-            for pluginFile in "$cacheRoot"/harness-memory@*/node_modules/harness-memory/dist/plugin/index.js; do
-              [ -f "$pluginFile" ] || continue
-
-              if ${gnugrep}/bin/grep -Fq 'console.log(PLUGIN_LOG_PREFIX, ...args);' "$pluginFile"; then
-                ${gnused}/bin/sed -i \
-                  's/  console\.log(PLUGIN_LOG_PREFIX, \.\.\.args);/  return;/' \
-                  "$pluginFile"
-              fi
-            done
-          '';
-        in
-        ''
-          wrapProgram $out/bin/opencode \
-            --run ${silenceHarnessMemoryLogs} \
-            --prefix PATH : ${lib.makeBinPath [ nodejs ]} \
-            --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}
-        '';
-    })
+    # Attach a TUI to the always-running opencode-server in the current repo,
+    # instead of `opencode` starting its own private session. Sources the
+    # password at runtime rather than going through home.sessionVariables,
+    # which would bake the secret into the world-readable Nix store.
+    (writeShellScriptBin "oc" ''
+      envFile="$HOME/.config/opencode-server.env"
+      if [ ! -r "$envFile" ]; then
+        echo "oc: missing $envFile (see systemd.user.services.opencode-server)" >&2
+        exit 1
+      fi
+      set -a
+      . "$envFile"
+      set +a
+      exec ${opencodeWrapped}/bin/opencode attach \
+        "''${OPENCODE_SERVER_URL:-http://127.0.0.1:4096}" --dir "$PWD" "$@"
+    '')
     lshw
     inxi
     cava
@@ -395,6 +422,37 @@
       Restart = "on-failure";
     };
     Install.WantedBy = [ "graphical-session.target" ];
+  };
+
+  # Persistent headless opencode server, so a run started at the desk stays
+  # reachable from a phone. The TUI becomes a client rather than the owner of
+  # the session -- that is the part that matters: a permission prompt raised
+  # mid-run is answerable from whichever client is at hand, desk or phone.
+  # Start work with `oc` (alias below), not bare `opencode`.
+  #
+  # Bound to 0.0.0.0, with the firewall opening 4096 on tailscale0 only --
+  # the same treatment 3389/3390 already get. Binding straight to the Tailscale
+  # address would race tailscaled at boot.
+  #
+  # EnvironmentFile is deliberately NOT optional. Without
+  # OPENCODE_SERVER_PASSWORD the server serves every route unauthenticated, and
+  # these agents hold bash and edit tools -- so a missing password file must
+  # mean "refuse to start", never "start wide open". The file is 0600 and
+  # outside the Nix store, because store contents are world-readable.
+  systemd.user.services.opencode-server = {
+    Unit = {
+      Description = "Headless opencode server (reachable over Tailscale)";
+      After = [ "network-online.target" ];
+      Wants = [ "network-online.target" ];
+    };
+    Service = {
+      ExecStart = "${opencodeWrapped}/bin/opencode serve --hostname 0.0.0.0 --port 4096";
+      WorkingDirectory = config.home.homeDirectory;
+      EnvironmentFile = "${config.home.homeDirectory}/.config/opencode-server.env";
+      Restart = "always";
+      RestartSec = 5;
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 
 

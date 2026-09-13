@@ -11,7 +11,8 @@
       "name": "Local LLM",
       "options": {
         "baseURL": "http://127.0.0.1:8080/v1",
-        "apiKey": "local"
+        "apiKey": "local",
+        "headerTimeout": 900000
       },
       "models": {
         "qwen3.6-35b-a3b": {
@@ -47,18 +48,18 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "Local LLM (short metadata)",
       "options": {
-        "baseURL": "http://127.0.0.1:8080/v1",
-        "apiKey": "local"
+        "baseURL": "http://127.0.0.1:8081/v1",
+        "apiKey": "local",
+        "headerTimeout": 120000
       },
       "models": {
-        "qwen3.6-35b-a3b": {
-          "name": "Qwen3.6 35B-A3B (short metadata)",
+        "qwen3-4b-instruct-2507": {
+          "name": "Qwen3 4B-Instruct-2507 (short metadata)",
           "limit": {
-            "context": 65536,
+            "context": 16384,
             "output": 512
           },
           "options": {
-            "chat_template_kwargs": { "enable_thinking": false },
             "temperature": 0.2,
             "parallel_tool_calls": false
           }
@@ -67,7 +68,7 @@
     }
   },
   "model": "local/qwen3.6-35b-a3b",
-  "small_model": "local/qwen3.6-35b-a3b",
+  "small_model": "local-title/qwen3-4b-instruct-2507",
   "compaction": {
     "prune": true,
     "reserved": 16384,
@@ -99,8 +100,7 @@
       "model": "local/qwen3.6-35b-a3b"
     },
     "title": {
-      "model": "local-title/qwen3.6-35b-a3b",
-      "reasoningEffort": "none",
+      "model": "local-title/qwen3-4b-instruct-2507",
       "temperature": 0.2
     },
     "raw": {
@@ -130,6 +130,9 @@
       "model": "local/qwen3.6-35b-a3b",
       "reasoningEffort": "medium",
       "prompt": "{file:./prompts/orchestrate.md}",
+      "options": {
+        "parallel_tool_calls": false
+      },
       "tools": {
         "bash": false,
         "edit": false,
@@ -148,6 +151,7 @@
           "*": "deny",
           "explore": "allow",
           "implementer": "allow",
+          "frontier-implementer": "allow",
           "operator": "allow",
           "tester": "allow"
         }
@@ -159,6 +163,9 @@
       "model": "openai/gpt-5.6-terra",
       "reasoningEffort": "medium",
       "prompt": "{file:./prompts/orchestrate.md}",
+      "options": {
+        "parallel_tool_calls": false
+      },
       "tools": {
         "bash": false,
         "edit": false,
@@ -177,6 +184,7 @@
           "*": "deny",
           "explore": "allow",
           "implementer": "allow",
+          "frontier-implementer": "allow",
           "operator": "allow",
           "tester": "allow"
         }
@@ -211,6 +219,29 @@
       "model": "local/qwen3.6-35b-a3b",
       "prompt": "{file:./prompts/implementer.md}",
       "reasoningEffort": "low",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "patch": true,
+        "glob": false,
+        "grep": false,
+        "bash": false,
+        "task": false,
+        "todowrite": false,
+        "webfetch": false,
+        "skill": false
+      },
+      "permission": {
+        "doom_loop": "deny"
+      },
+      "steps": 30
+    },
+    "frontier-implementer": {
+      "description": "Same contract as implementer, on the frontier model. For units dominated by writing new prose. Costs API spend; use sparingly.",
+      "mode": "subagent",
+      "model": "openai/gpt-5.6-terra",
+      "prompt": "{file:./prompts/implementer.md}",
       "tools": {
         "read": true,
         "write": true,

@@ -211,8 +211,9 @@
     # 22: SSH. 3389: GNOME Remote Login (system daemon, headless session).
     # 3390: GNOME Desktop Sharing (user daemon, mirrors the seat0 session) --
     # moved off the default because both backends bind 3389 otherwise.
+    # 4096: opencode-server, for checking and steering a run from a phone.
     # All reachable only over Tailscale; the campus network cannot route here.
-    interfaces."tailscale0".allowedTCPPorts = [ 22 3389 3390 ];
+    interfaces."tailscale0".allowedTCPPorts = [ 22 3389 3390 4096 ];
   };
 
 
@@ -413,10 +414,20 @@
       "-ctk" "q8_0"
       "-ctv" "q8_0"
 
-      # Whole transformer on the GPU; the experts of 27 MoE layers stay in
-      # system RAM so the remainder fits in 12GB of VRAM.
+      # Physical batch; default 512. Larger amortises the CPU-side expert
+      # gather, which is what makes prefill decay at long context (measured
+      # 335 t/s at 2-5k prompts down to 178 t/s at 20-30k). Costs VRAM on top
+      # of --n-cpu-moe, so these two compete: if the service stops starting,
+      # this is the first thing to drop back to 512.
+      "-ub" "1024"
+
+      # Whole transformer on the GPU; the experts of 24 of 41 MoE layers stay
+      # in system RAM so the remainder fits in 12GB of VRAM. Experts cost
+      # 408 MiB/layer, so each -1 here is +408 MiB VRAM; 24 lands at ~9.9GB.
+      # Assumes this seat runs only the GDM greeter -- a real GNOME session
+      # needs that headroom back, so raise this to 27 before using the desktop.
       "-ngl" "999"
-      "--n-cpu-moe" "27"
+      "--n-cpu-moe" "24"
       "--load-mode" "none"
       "--fit" "off"
 
@@ -435,8 +446,11 @@
       # #23335 / #23302 are still open and unconfirmed, so if token-stream
       # weirdness ever appears that DRY does not explain, these are still
       # the first three lines to pull.
+      # n-max was 6 and measured mean accepted len 5.88 -- saturating the cap,
+      # not the model. Raised to 10; if acceptance drops much below ~0.85,
+      # walk it back. Check with: journalctl -u llama-cpp | grep 'draft acceptance'
       "--spec-type" "draft-mtp"
-      "--spec-draft-n-max" "6"
+      "--spec-draft-n-max" "10"
       "--spec-draft-p-min" "0.6"
 
       "--jinja"
@@ -492,7 +506,11 @@
       # tool names constantly; penalising verbatim repeats is actively wrong
       # for this workload. Qwen's own spec says presence-penalty 1.5 is for
       # general chat and NOT for coding, for the same reason.
-      "--cache-ram" "2048"
+      # Host-memory prompt cache: what lets the orchestrator rotate workers
+      # through the single slot without re-prefilling each switch. KV is
+      # 22304 B/token here, so this holds ~865k tokens (~28 worker contexts);
+      # the old 2048 held three, which is why switches always cost a reprefill.
+      "--cache-ram" "18432"
       "--slot-prompt-similarity" "0.5"
 
       "--parallel" "1"
@@ -515,6 +533,61 @@
     # Module default is 300s. Reloading an 18GB model is slow enough without
     # waiting five minutes first.
     serviceConfig.RestartSec = lib.mkForce 10;
+  };
+
+  # Second, tiny instance purely for OpenCode's title/metadata calls.
+  #
+  # Those are short and frequent, but the 35B has --parallel 1, so every title
+  # generation took the single slot and evicted whatever working KV was in it
+  # -- a recurring reprefill tax on real work. This moves them off that slot
+  # entirely. services.llama-cpp is single-instance, hence the hand-rolled unit;
+  # the hardening mirrors what that module applies.
+  #
+  # CPU-only (-ngl 0): VRAM is fully committed to the 35B, and at 4B/Q4_K_M on
+  # CPU a title still returns in well under a second. --threads 2 so it cannot
+  # meaningfully steal cores from the 35B's 8 CPU-resident expert threads.
+  systemd.services.llama-cpp-small = {
+    description = "llama.cpp server (4B) for OpenCode title and metadata calls";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    environment = {
+      HOME = "/var/lib/llama-cpp-small";
+      XDG_CACHE_HOME = "/var/cache/llama-cpp-small";
+    };
+    serviceConfig = {
+      Type = "simple";
+      DynamicUser = true;
+      StateDirectory = "llama-cpp-small";
+      CacheDirectory = "llama-cpp-small";
+      ProtectHome = true;
+      ProtectSystem = "strict";
+      PrivateTmp = true;
+      NoNewPrivileges = true;
+      Restart = "on-failure";
+      RestartSec = 10;
+      # Plain string rather than escapeShellArgs: every argument here is a bare
+      # token, and this renders the same way the services.llama-cpp module does.
+      ExecStart = lib.concatStringsSep " " [
+        "${pkgs.llama-cpp-vulkan}/bin/llama-server"
+        "--host 127.0.0.1"
+        "--port 8081"
+        "-m /var/lib/llama-models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+        # This model's KV is 144 KiB/token (36 layers, 8 KV heads, f16) -- far
+        # heavier per token than the 35B's 22 KiB, because the 35B has only two
+        # KV heads and quantised KV. 16384 costs ~2.4GB of RAM; don't raise it
+        # casually. Keep in sync with the local-title provider's limit.context.
+        "-c 16384"
+        "-ngl 0"
+        "--threads 2"
+        "--parallel 1"
+        "--jinja"
+        "--metrics"
+        "--timeout 0"
+        # 2507-Instruct is a non-thinking model, so there is no reasoning
+        # budget to spend here and no </think> to strip.
+        "--temp 0.2"
+      ];
+    };
   };
 
   # The degenerate-loop failure mode was only ever cured by a restart: after

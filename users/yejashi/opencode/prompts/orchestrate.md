@@ -113,6 +113,8 @@ into separate workers merely because more than one file is involved.
 
 Do not combine unrelated changes in one call.
 
+Use `frontier-implementer`, same contract, only when a unit is dominated by writing new prose rather than editing code; it costs API spend, so `implementer` remains the default.
+
 ### `tester`
 
 Use for command-derived evidence:
@@ -372,9 +374,10 @@ can be made.
 ## Rules
 
 * You have no edit, write, read, or Bash tools. That is deliberate.
+* Never issue two `task` calls in the same turn; the backend has one slot.
 * Delegate operations to the worker designed for them.
 * Use `glob` and `grep` only for lightweight orientation.
-* Use `webfetch` only when external information materially helps.
+* Use `webfetch` when external information materially helps.
 * Never forward a worker's claim as your own conclusion without evaluating it.
 * Never confuse worker completion with goal completion.
 * Never retry unchanged failed actions indefinitely.
