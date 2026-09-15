@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orchestrate-local",
   "provider": {
     "openai": {
       "options": {
@@ -17,28 +18,42 @@
       "models": {
         "qwen3.6-35b-a3b": {
           "name": "Qwen3.6 35B-A3B IQ4_XS 64k (local)",
+          "temperature": true,
+          "reasoning": true,
+          "interleaved": {
+            "field": "reasoning_content"
+          },
           "limit": {
             "context": 65536,
             "output": 16384
           },
           "options": {
-            "reasoningEffort": "medium",
-            "temperature": 0.7,
+            "temperature": 0.6,
             "top_p": 0.95,
-            "parallel_tool_calls": true
+            "parallel_tool_calls": true,
+            "chat_template_kwargs": {
+              "enable_thinking": true
+            }
           },
           "variants": {
             "low": {
-              "reasoningEffort": "low"
+              "disabled": true
             },
-            "balanced": {
-              "reasoningEffort": "medium"
+            "medium": {
+              "disabled": true
             },
-            "deep": {
-              "reasoningEffort": "high"
+            "high": {
+              "disabled": true
+            },
+            "thinking": {
+              "chat_template_kwargs": {
+                "enable_thinking": true
+              }
             },
             "off": {
-              "reasoningEffort": "none"
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
             }
           }
         }
@@ -55,6 +70,7 @@
       "models": {
         "qwen3-4b-instruct-2507": {
           "name": "Qwen3 4B-Instruct-2507 (short metadata)",
+          "temperature": true,
           "limit": {
             "context": 16384,
             "output": 512
@@ -80,259 +96,172 @@
   },
   "lsp": {
     "ruff": {
-      "command": ["ruff", "server"],
-      "extensions": [".py", ".pyi"]
+      "command": [
+        "ruff",
+        "server"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ]
     },
     "clangd": {
-      "command": ["clangd"],
-      "extensions": [".c", ".h", ".cc", ".cpp", ".cxx", ".hh", ".hpp", ".hxx", ".m", ".mm"]
+      "command": [
+        "clangd"
+      ],
+      "extensions": [
+        ".c",
+        ".h",
+        ".cc",
+        ".cpp",
+        ".cxx",
+        ".hh",
+        ".hpp",
+        ".hxx",
+        ".m",
+        ".mm"
+      ]
     },
     "bash": {
-      "command": ["bash-language-server", "start"],
-      "extensions": [".sh", ".bash", ".bats"]
+      "command": [
+        "bash-language-server",
+        "start"
+      ],
+      "extensions": [
+        ".sh",
+        ".bash",
+        ".bats"
+      ]
     }
   },
   "agent": {
     "compaction": {
-      "model": "local/qwen3.6-35b-a3b"
+      "model": "local/qwen3.6-35b-a3b",
+      "temperature": 0.6
     },
     "summary": {
-      "model": "local/qwen3.6-35b-a3b"
+      "model": "local/qwen3.6-35b-a3b",
+      "temperature": 0.6
     },
     "title": {
       "model": "local-title/qwen3-4b-instruct-2507",
       "temperature": 0.2
     },
-    "code-local": {
-      "description": "Flat local coding agent: reads, edits and runs commands itself. The fast path for tasks that do not need orchestration.",
+    "orchestrate-local": {
+      "description": "Local lead engineer: investigates, integrates and verifies; delegates bounded work to local specialists.",
       "mode": "primary",
       "model": "local/qwen3.6-35b-a3b",
-      "reasoningEffort": "medium",
-      "prompt": "{file:./prompts/code.md}",
-      "tools": {
-        "read": true,
-        "edit": true,
-        "write": true,
-        "patch": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "bash": true,
-        "todowrite": true,
-        "skill": true,
-        "webfetch": true,
-        "task": false
-      },
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "prompt": "{file:./prompts/orchestrate.md}",
       "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "task": {
+          "*": "deny",
+          "explore": "allow",
+          "implementer": "allow",
+          "reviewer": "allow"
+        },
+        "doom_loop": "deny"
+      }
+    },
+    "orchestrate-frontier": {
+      "description": "Optional paid lead engineer using the same workflow and local specialists.",
+      "mode": "primary",
+      "model": "openai/gpt-5.6-terra",
+      "reasoningEffort": "medium",
+      "prompt": "{file:./prompts/orchestrate.md}",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "task": {
+          "*": "deny",
+          "explore": "allow",
+          "implementer": "allow",
+          "reviewer": "allow"
+        },
+        "doom_loop": "deny"
+      }
+    },
+    "code-local": {
+      "description": "Direct local coding without delegation; also useful for comparing orchestration overhead.",
+      "mode": "primary",
+      "model": "local/qwen3.6-35b-a3b",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "prompt": "{file:./prompts/code.md}",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "task": "deny",
+        "doom_loop": "deny"
+      }
+    },
+    "explore": {
+      "description": "Search unfamiliar areas and answer one bounded source question with paths and evidence. No shell or edits.",
+      "mode": "subagent",
+      "model": "local/qwen3.6-35b-a3b",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "prompt": "{file:./prompts/explore.md}",
+      "steps": 16,
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "doom_loop": "deny"
+      }
+    },
+    "implementer": {
+      "description": "Own one bounded coding unit: investigate relevant files, implement the fix, and run focused tests. No delegation.",
+      "mode": "subagent",
+      "model": "local/qwen3.6-35b-a3b",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "prompt": "{file:./prompts/implementer.md}",
+      "steps": 40,
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "edit": "allow",
+        "bash": "allow",
+        "skill": "allow",
+        "doom_loop": "deny"
+      }
+    },
+    "reviewer": {
+      "description": "Independently check a nontrivial change for correctness and regressions; inspect source/diff and run focused checks. Report findings, do not fix.",
+      "mode": "subagent",
+      "model": "local/qwen3.6-35b-a3b",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "prompt": "{file:./prompts/reviewer.md}",
+      "steps": 20,
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
         "doom_loop": "deny"
       }
     },
     "raw": {
-      "description": "Unfiltered chat/creative writing. No coding-agent system prompt, no tools.",
+      "description": "Local chat and creative writing without coding tools.",
       "mode": "primary",
       "model": "local/qwen3.6-35b-a3b",
       "prompt": "{file:./prompts/raw.md}",
-      "tools": {
-        "bash": false,
-        "edit": false,
-        "write": false,
-        "read": false,
-        "grep": false,
-        "glob": false,
-        "list": false,
-        "patch": false,
-        "todowrite": false,
-        "todoread": false,
-        "webfetch": false,
-        "task": false,
-        "skill": false
+      "permission": {
+        "*": "deny"
       }
-    },
-    "orchestrate-local": {
-      "description": "Fully local orchestration: Qwen plans and reviews while local workers execute.",
-      "mode": "primary",
-      "model": "local/qwen3.6-35b-a3b",
-      "reasoningEffort": "medium",
-      "prompt": "{file:./prompts/orchestrate.md}",
-      "options": {
-        "parallel_tool_calls": true
-      },
-      "tools": {
-        "bash": false,
-        "edit": false,
-        "write": false,
-        "patch": false,
-        "read": true,
-        "webfetch": true,
-        "glob": true,
-        "grep": true,
-        "task": true,
-        "todowrite": true,
-        "skill": true
-      },
-      "permission": {
-        "task": {
-          "*": "deny",
-          "explore": "allow",
-          "implementer": "allow",
-          "frontier-implementer": "allow",
-          "operator": "allow",
-          "tester": "allow"
-        }
-      }
-    },
-    "orchestrate-frontier": {
-      "description": "Frontier orchestration: GPT-5.6 Terra plans and reviews while local workers execute.",
-      "mode": "primary",
-      "model": "openai/gpt-5.6-terra",
-      "reasoningEffort": "medium",
-      "prompt": "{file:./prompts/orchestrate.md}",
-      "options": {
-        "parallel_tool_calls": true
-      },
-      "tools": {
-        "bash": false,
-        "edit": false,
-        "write": false,
-        "patch": false,
-        "read": true,
-        "webfetch": true,
-        "glob": true,
-        "grep": true,
-        "task": true,
-        "todowrite": true,
-        "skill": true
-      },
-      "permission": {
-        "task": {
-          "*": "deny",
-          "explore": "allow",
-          "implementer": "allow",
-          "frontier-implementer": "allow",
-          "operator": "allow",
-          "tester": "allow"
-        }
-      }
-    },
-    "explore": {
-      "description": "Local source browser for narrow code questions; cannot run shell commands or inspect Git state.",
-      "mode": "subagent",
-      "model": "local/qwen3.6-35b-a3b",
-      "prompt": "You are a read-only local source browser. Answer one narrow codebase question for the orchestrator. Use glob and grep to locate relevant code, then read only the smallest set of files needed. You have no shell access: never claim to run or infer git status, git diff, git log, builds, tests, filesystem metadata, or any other command output. If asked for command-derived information, report that the task requires the tester worker. Do not redesign, edit, run commands, or delegate. The orchestrator reads known files itself, so you are called for breadth: sweep widely, then distil. Keep the entire response to at most forty lines -- richer answers are welcome when they save the orchestrator a follow-up question, but never paste long file contents. State the conclusion first, then only the paths, symbols, and short evidence needed for the next decision.",
-      "reasoningEffort": "low",
-      "tools": {
-        "read": true,
-        "glob": true,
-        "grep": true,
-        "bash": false,
-        "write": false,
-        "edit": false,
-        "patch": false,
-        "task": false,
-        "todowrite": false,
-        "webfetch": false
-      },
-      "permission": {
-        "doom_loop": "deny"
-      },
-      "steps": 30
-    },
-    "implementer": {
-      "description": "Edits known files using file tools only; cannot run shell or Git commands.",
-      "mode": "subagent",
-      "model": "local/qwen3.6-35b-a3b",
-      "prompt": "{file:./prompts/implementer.md}",
-      "reasoningEffort": "low",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "patch": true,
-        "glob": false,
-        "grep": false,
-        "bash": false,
-        "task": false,
-        "todowrite": false,
-        "webfetch": false,
-        "skill": false
-      },
-      "permission": {
-        "doom_loop": "deny"
-      },
-      "steps": 30
-    },
-    "frontier-implementer": {
-      "description": "Same contract as implementer, on the frontier model. For units dominated by writing new prose. Costs API spend; use sparingly.",
-      "mode": "subagent",
-      "model": "openai/gpt-5.6-terra",
-      "prompt": "{file:./prompts/implementer.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "patch": true,
-        "glob": false,
-        "grep": false,
-        "bash": false,
-        "task": false,
-        "todowrite": false,
-        "webfetch": false,
-        "skill": false
-      },
-      "permission": {
-        "doom_loop": "deny"
-      },
-      "steps": 30
-    },
-    "operator": {
-      "description": "Bash-only operator for exact state-changing shell commands, including Git staging, commits, and pushes.",
-      "mode": "subagent",
-      "model": "local/qwen3.6-35b-a3b",
-      "prompt": "You are the Bash-only state-changing command operator. Execute only the exact shell commands and paths supplied by the orchestrator. Use Bash immediately; never inspect with read, glob, grep, or skill, and never invent or broaden a command. For multiple ordered commands, run one Bash call at a time and inspect its result before continuing. Stop immediately on failure. End with exactly four lines named FILES, CHANGES, VERIFIED, and ISSUES.",
-      "tools": {
-        "bash": true,
-        "read": false,
-        "glob": false,
-        "grep": false,
-        "write": false,
-        "edit": false,
-        "patch": false,
-        "task": false,
-        "todowrite": false,
-        "webfetch": false,
-        "skill": false
-      },
-      "permission": {
-        "doom_loop": "deny"
-      },
-      "steps": 30
-    },
-    "tester": {
-      "description": "Bash-only runner for read-only Git inspections, diagnostics, builds, and tests. Never edits files.",
-      "mode": "subagent",
-      "model": "local/qwen3.6-35b-a3b",
-      "prompt": "{file:./prompts/tester.md}",
-      "reasoningEffort": "low",
-      "tools": {
-        "bash": true,
-        "read": false,
-        "glob": false,
-        "grep": false,
-        "write": false,
-        "edit": false,
-        "patch": false,
-        "task": false,
-        "todowrite": false,
-        "webfetch": false,
-        "skill": false
-      },
-      "permission": {
-        "doom_loop": "deny"
-      },
-      "steps": 30
     }
   },
-  "plugin": [
-    "../../.cache/opencode/packages/harness-memory@0.5.1/node_modules/harness-memory/dist/plugin/index.js"
-  ]
+  "plugin": []
 }

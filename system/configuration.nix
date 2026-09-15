@@ -271,6 +271,10 @@
       "storage"
       "network"
       "lp"
+      # Talk to the Docker daemon without sudo, which the SWE-bench harness
+      # requires. See the virtualisation.docker block below for the security
+      # note that comes with this.
+      "docker"
     ];
     # initialPassword = "password";
     packages = with pkgs; [
@@ -294,6 +298,39 @@
   programs.steam.enable = true;
   services.input-remapper.enable = true;
   services.flatpak.enable = true;
+
+  # Docker, for the SWE-bench harness (~/Documents/repos/benchmarks/oc-bench).
+  # SWE-bench grades a patch only by running the repository's real test suite
+  # inside that task's published image -- there is no host-only evaluation mode --
+  # so nothing in that benchmark runs without a daemon here.
+  #
+  # The benchmark starts its containers with --network host, which is what lets a
+  # containerised agent reach services.llama-cpp below on 127.0.0.1:8080. That
+  # only works because the container shares the host network namespace; llama-cpp
+  # binds loopback and is deliberately not exposed any wider.
+  virtualisation.docker = {
+    enable = true;
+
+    # autoPrune is deliberately NOT enabled. It removes *unused* images, and a
+    # 20-task SWE-bench subset is ~58GB of instance images that sit unused
+    # between runs and cost a full re-pull to replace. Reclaim space by hand
+    # instead, which distinguishes the cheap garbage from the expensive cache:
+    #
+    #   docker builder prune          # build layers, always safe
+    #   make -C <oc-bench> clean-images   # just the opencode overlay images
+    #   docker image prune -a         # nuclear: re-pulls 58GB next run
+    #
+    # /var/lib/docker lives on root, which had 178GB free when this was added.
+  };
+
+  # NOTE: membership in "docker" is root-equivalent -- the daemon runs as root and
+  # will bind-mount any path for you. That matters more than usual on this host,
+  # because services.openssh above accepts password authentication for this same
+  # account (over Tailscale only). Anyone who gets that password gets root here.
+  # The alternative, virtualisation.docker.rootless, is not used: the SWE-bench
+  # harness talks to the standard socket through docker-py and its image builds
+  # assume a rootful daemon.
+  # -> "docker" is in users.users.yejashi.extraGroups above.
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

@@ -1,6 +1,6 @@
 ---
 name: nixos
-description: Operate the Yejashi/nixOS-Configuration repository correctly: find Nix packages and module options, edit NixOS vs Home Manager at the right scope, work with this repo's flakes and stable/unstable overlay, evaluate and build changes, update flake inputs safely, diagnose Nix errors, and apply configuration changes.
+description: Operate the Yejashi/nixOS-Configuration repository's NixOS and standalone Home Manager configuration, including package and option discovery, scoped edits, flake pins, validation and activation.
 compatibility: opencode
 metadata:
   repository: Yejashi/nixOS-Configuration
@@ -72,27 +72,24 @@ Current `system/flake.nix` uses:
 
 - `nixpkgs` -> `nixos-26.05`
 - `nixpkgs-unstable` -> `nixpkgs-unstable`
+- `nixpkgs-opencode` -> a separately pinned revision for the working OpenCode build
 - `home-manager` -> `release-26.05`, following stable `nixpkgs`
 - `spicetify-nix`
 - `zen-browser`
 
 The machine intentionally stays on stable NixOS while selected fast-moving packages come from unstable.
 
-The existing overlay imports unstable and currently overrides:
+The overlay is supplied to both NixOS and Home Manager. `pkgs.opencode` comes
+from the separate `nixpkgs-opencode` input; `pkgs.llama-cpp-vulkan` comes from
+unstable. Read `system/flake.nix` for the current pins and the reason for the
+OpenCode exception. Do not replace that pin merely because another build has
+the same version string.
+
+Use stable by default. If one package needs unstable, add it to the existing
+overlay attribute set while preserving the other definitions:
 
 ```nix
 {
-  opencode = unstable.opencode;
-}
-```
-
-That overlay is supplied to both the NixOS and Home Manager package sets, so `pkgs.opencode` resolves to unstable in both.
-
-Use stable by default. If one package genuinely needs unstable, extend the existing whitelist-style overlay:
-
-```nix
-{
-  opencode = unstable.opencode;
   somePackage = unstable.somePackage;
 }
 ```
@@ -566,25 +563,21 @@ Distinguish a broken package derivation from a Nix configuration error. Read the
 
 ## 14. OpenCode worker roles for Nix tasks
 
-The orchestrator knows this skill but intentionally does not edit files or execute arbitrary shell itself.
+The lead can read, edit and run commands directly. Use delegation for a bounded
+unit that benefits from a separate context:
 
-Use:
+- **explore** — investigate unfamiliar declarations and report source evidence;
+- **implementer** — discover the relevant package/options, edit within the
+  assigned scope, and evaluate/build the resulting configuration;
+- **reviewer** — inspect the diff, module scope and verification evidence, and
+  run additional focused checks when necessary. It does not edit or activate.
 
-- **explore** — locate/read relevant repository declarations and answer narrow source questions;
-- **tester** — run read-only shell inspection, Nix search/eval/build, diagnostics, and Git diff/status;
-- **implementer** — edit already-identified files; it cannot broadly search or run shell commands;
-- **operator** — run exact state-changing shell commands such as activation, rebuild, Git staging/commit/push.
-
-Typical sequence:
-
-1. Explore the relevant existing configuration.
-2. If package/option identity is uncertain, use tester for discovery and exact flake verification.
-3. Give implementer exact file paths and edits.
-4. Use tester to evaluate/build and inspect the diff.
-5. Use operator only for state-changing commands the user requested.
-
-Never ask implementer to "find the right file."
-Never ask operator to improvise after a failure.
+Give implementer the outcome, relevant configuration area, constraints and
+acceptance checks. It can locate files and resolve implementation details.
+The lead integrates the result and performs activation only when authorized by
+the user. There are no separate tester or operator agents, and workers cannot
+delegate further. Keep local worker calls sequential because they share one
+inference slot.
 
 ## 15. Machine-specific guardrails
 
@@ -597,4 +590,3 @@ Never ask operator to improvise after a failure.
 - The active graphics stack is AMD; do not resurrect the commented NVIDIA configuration without a real hardware change.
 - Tailscale uses `--accept-dns=false`; DNS/network changes must account for that policy.
 - This machine is deliberately configured to remain reachable remotely instead of automatically suspending while plugged in or at the login screen. Do not undo that incidentally.
-

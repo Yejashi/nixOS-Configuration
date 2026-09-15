@@ -168,7 +168,14 @@ in
     spotify
     thunderbird
     mailspring
-    youtube-music
+    pear-desktop
+    git
+    lazygit
+    tree-sitter
+    curl
+    ripgrep
+    fd
+    gcc
     ghostscript
     xcolor
     zotero
@@ -182,6 +189,17 @@ in
     # CLI tools (llama-cli, llama-bench, ...) for poking at models by hand.
     # The server itself runs from services.llama-cpp, not from here.
     llama-cpp-vulkan
+
+    # LSP servers (declared here so LazyVim uses PATH executables instead of
+    # Mason downloading duplicates).
+    bash-language-server
+    llvmPackages.clang-tools
+    pyright
+    lua-language-server
+    nil
+    vscode-langservers-extracted
+    yaml-language-server
+    marksman
   ];
 
   xdg.desktopEntries.lm-studio = {
@@ -262,6 +280,10 @@ in
       source = ./opencode;
       recursive = true;
       force = true;
+    };
+
+    ".config/nvim" = {
+      source = ./nvim;
     };
   };
 
