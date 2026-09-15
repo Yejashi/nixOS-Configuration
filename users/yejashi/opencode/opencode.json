@@ -75,8 +75,8 @@
     "preserve_recent_tokens": 8000
   },
   "tool_output": {
-    "max_lines": 800,
-    "max_bytes": 24000
+    "max_lines": 2000,
+    "max_bytes": 65536
   },
   "lsp": {
     "ruff": {
@@ -102,6 +102,30 @@
     "title": {
       "model": "local-title/qwen3-4b-instruct-2507",
       "temperature": 0.2
+    },
+    "code-local": {
+      "description": "Flat local coding agent: reads, edits and runs commands itself. The fast path for tasks that do not need orchestration.",
+      "mode": "primary",
+      "model": "local/qwen3.6-35b-a3b",
+      "reasoningEffort": "medium",
+      "prompt": "{file:./prompts/code.md}",
+      "tools": {
+        "read": true,
+        "edit": true,
+        "write": true,
+        "patch": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "bash": true,
+        "todowrite": true,
+        "skill": true,
+        "webfetch": true,
+        "task": false
+      },
+      "permission": {
+        "doom_loop": "deny"
+      }
     },
     "raw": {
       "description": "Unfiltered chat/creative writing. No coding-agent system prompt, no tools.",
@@ -131,14 +155,14 @@
       "reasoningEffort": "medium",
       "prompt": "{file:./prompts/orchestrate.md}",
       "options": {
-        "parallel_tool_calls": false
+        "parallel_tool_calls": true
       },
       "tools": {
         "bash": false,
         "edit": false,
         "write": false,
         "patch": false,
-        "read": false,
+        "read": true,
         "webfetch": true,
         "glob": true,
         "grep": true,
@@ -164,14 +188,14 @@
       "reasoningEffort": "medium",
       "prompt": "{file:./prompts/orchestrate.md}",
       "options": {
-        "parallel_tool_calls": false
+        "parallel_tool_calls": true
       },
       "tools": {
         "bash": false,
         "edit": false,
         "write": false,
         "patch": false,
-        "read": false,
+        "read": true,
         "webfetch": true,
         "glob": true,
         "grep": true,
@@ -194,7 +218,7 @@
       "description": "Local source browser for narrow code questions; cannot run shell commands or inspect Git state.",
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
-      "prompt": "You are a read-only local source browser. Answer one narrow codebase question for the orchestrator. Use glob and grep to locate relevant code, then read only the smallest set of files needed. You have no shell access: never claim to run or infer git status, git diff, git log, builds, tests, filesystem metadata, or any other command output. If asked for command-derived information, report that the task requires the tester worker. Do not redesign, edit, run commands, or delegate. Keep the entire response to at most fifteen lines. State the conclusion first, then only the paths, symbols, and short evidence needed for the next decision.",
+      "prompt": "You are a read-only local source browser. Answer one narrow codebase question for the orchestrator. Use glob and grep to locate relevant code, then read only the smallest set of files needed. You have no shell access: never claim to run or infer git status, git diff, git log, builds, tests, filesystem metadata, or any other command output. If asked for command-derived information, report that the task requires the tester worker. Do not redesign, edit, run commands, or delegate. The orchestrator reads known files itself, so you are called for breadth: sweep widely, then distil. Keep the entire response to at most forty lines -- richer answers are welcome when they save the orchestrator a follow-up question, but never paste long file contents. State the conclusion first, then only the paths, symbols, and short evidence needed for the next decision.",
       "reasoningEffort": "low",
       "tools": {
         "read": true,

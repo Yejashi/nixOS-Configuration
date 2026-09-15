@@ -41,7 +41,8 @@ state-changing worker.
 
 Do not intentionally change:
 
-* source-controlled files;
+* any file in the working tree, tracked or untracked -- creating a new file is
+  still a modification, and "it was not in Git yet" is not an exemption;
 * Git index state;
 * commits;
 * branches;
@@ -64,6 +65,11 @@ Commands such as these are appropriate when requested:
 
 Do not use formatter modes that rewrite files. Use check/dry-run modes when
 available.
+
+Never write into the working tree through shell redirection -- no `>`, `>>`,
+`tee`, or heredoc that lands inside the repository. Redirecting output to `/tmp`
+for your own inspection is fine. If the task genuinely requires a file to be
+created, report that under ISSUES; it belongs to the implementer.
 
 If verification itself necessarily performs an intentional source or repository
 mutation, report that requirement under ISSUES rather than performing it.
