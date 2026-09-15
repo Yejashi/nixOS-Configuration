@@ -67,9 +67,51 @@ in
   programs.spicetify =
     let
       spicePkgs = inputs.spicetify-nix.packages.${pkgs.system}.default;
+
+      # Two things broke this against nixpkgs 26.05, and the module gives us
+      # exactly one lever to fix both: spicetifyPackage. Its extraCommands and
+      # cssMap options are declared but never passed to the builder in this
+      # fork, so they are not usable as hooks.
+      #
+      # 1. Layout. spicetify-cli now ships bin/spicetify plus
+      #    share/spicetify/{jsHelper,css-map.json}; it used to ship
+      #    bin/spicetify-cli and bin/jsHelper. The builder still copies the old
+      #    paths and dies on "cp: cannot stat .../bin/spicetify-cli", and it
+      #    reads the css map as "${spicetify.src}/css-map.json". So the shim
+      #    republishes the old bin/ layout and carries a src pointing at the
+      #    directory that now holds the map.
+      #
+      # 2. State dir. spicetify 2.43.2 writes its backup under $XDG_STATE_HOME
+      #    and no longer creates the directory, so the builder's final
+      #    "spicetify-cli --no-restart backup apply" dies on the sandbox's
+      #    read-only /homeless-shelter. bin/spicetify-cli is therefore a
+      #    wrapper that points HOME at the build dir first. The backup itself
+      #    is throwaway - only the "apply" half affects $out, and restoring is
+      #    a rebuild here, not a spicetify restore.
+      #
+      # Upstream has not fixed either: yuu-fur/spicetify-flake HEAD is the rev
+      # we already pin. Revisit if that repo moves.
+      spicetifyCompat = pkgs.runCommand "spicetify-cli-compat"
+        {
+          passthru.src = "${pkgs.spicetify-cli}/share/spicetify";
+        }
+        ''
+          mkdir -p $out/bin
+          cat > $out/bin/spicetify-cli <<'WRAPPER'
+          #!${pkgs.runtimeShell}
+          export HOME="''${TMPDIR:-/tmp}/spicetify-home"
+          export XDG_STATE_HOME="$HOME/.local/state"
+          mkdir -p "$XDG_STATE_HOME/spicetify"
+          exec ${pkgs.spicetify-cli}/share/spicetify/spicetify "$@"
+          WRAPPER
+          chmod +x $out/bin/spicetify-cli
+          ln -s spicetify-cli $out/bin/spicetify
+          cp -r ${pkgs.spicetify-cli}/share/spicetify/jsHelper $out/bin/jsHelper
+        '';
     in
     {
       enable = true;
+      spicetifyPackage = spicetifyCompat;
       enabledExtensions = with spicePkgs.extensions; [
         adblock
         hidePodcasts
@@ -165,7 +207,8 @@ in
     rustfmt
     clippy
     peek
-    spotify
+    # spotify comes from programs.spicetify (the spiced build already
+    # provides bin/spotify); listing it here too collides in buildEnv.
     thunderbird
     mailspring
     pear-desktop

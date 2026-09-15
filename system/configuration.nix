@@ -461,16 +461,21 @@
       # Whole transformer on the GPU; the experts of 24 of 41 MoE layers stay
       # in system RAM so the remainder fits in 12GB of VRAM. Experts cost
       # 408 MiB/layer, so each -1 here is +408 MiB VRAM; 24 lands at ~9.9GB.
-      # Assumes this seat runs only the GDM greeter -- a real GNOME session
-      # needs that headroom back, so raise this to 27 before using the desktop.
+      # 24 was previously believed to need raising to 27 under a real GNOME
+      # session. Measured 2026-09-15 with GNOME up (desktop held 0.94 GiB
+      # before any model load): 24 is fine and is the fastest setting, given
+      # --spec-draft-n-max 6 below. Going to 27 frees 1260 MiB but costs 8%
+      # of base speed (18.3 -> 16.8 tok/s with speculation off) and never
+      # wins. Raise it only if a heavier desktop makes the model fail to
+      # load -- and re-measure n-max if you do, since it moves the cliff.
       "-ngl" "999"
       "--n-cpu-moe" "24"
       "--load-mode" "none"
       "--fit" "off"
 
-      # MTP-head speculative decoding, roughly 2x generation throughput
-      # (19 tok/s measured without it, ~32 tok/s with, at 0.85 draft
-      # acceptance).
+      # MTP-head speculative decoding: 18.3 tok/s without, 30.8 with, at 0.84
+      # draft acceptance (measured 2026-09-15 with a GNOME session running).
+      # The older "~32 tok/s" note came from a greeter-only seat.
       #
       # These were briefly removed on 2026-09-13 while chasing agent
       # "looping", on the theory that upstream issues #23335 / #23302
@@ -483,11 +488,36 @@
       # #23335 / #23302 are still open and unconfirmed, so if token-stream
       # weirdness ever appears that DRY does not explain, these are still
       # the first three lines to pull.
-      # n-max was 6 and measured mean accepted len 5.88 -- saturating the cap,
-      # not the model. Raised to 10; if acceptance drops much below ~0.85,
-      # walk it back. Check with: journalctl -u llama-cpp | grep 'draft acceptance'
+      #
+      # n-max was raised 6 -> 10 on the theory that mean accepted len 5.88
+      # was "saturating the cap, not the model". That reasoning was wrong and
+      # cost ~37% of generation speed. Measured 2026-09-15 over four
+      # coding-shaped prompts, 2048 generated tokens each, this exact config
+      # otherwise unchanged (system/llama-bench-spec.sh in this repo):
+      #
+      #   n-max      4     5     6     7     8    10
+      #   tok/s   28.9  29.6  30.8  21.1  20.6  19.4
+      #
+      # There is a cliff between 6 and 7, not a gradual roll-off. Acceptance
+      # is flat across it (0.844 at 6, 0.832 at 7) and mean accepted len even
+      # improves (4.10 -> 4.70), so this is not draft quality: the
+      # verification batch's peak allocation outgrows VRAM and spills. Peak
+      # is not visible in post-load VRAM, which is why n7 can report *less*
+      # used than n6 and still be 31% slower.
+      #
+      # The cliff moves with free VRAM rather than sitting at a fixed
+      # occupancy: at --n-cpu-moe 27 (1260 MiB freer) n10 recovers 19.4 ->
+      # 27.1. But paying 3 layers of CPU offload costs 8% of base speed and
+      # never beats n6 here (n6: 30.8 @24, 29.9 @25, 28.6 @27), so 24 stays.
+      #
+      # If you change -ub, --n-cpu-moe, the context size or the model, the
+      # cliff moves and this number must be re-measured. Run
+      # system/llama-bench-spec.sh rather than assuming 6 is still right;
+      # it stops the service, sweeps n-max and restarts it (no root needed,
+      # polkit permits managing llama-cpp as the local user).
+      # Check acceptance with: journalctl -u llama-cpp | grep 'draft acceptance'
       "--spec-type" "draft-mtp"
-      "--spec-draft-n-max" "10"
+      "--spec-draft-n-max" "6"
       "--spec-draft-p-min" "0.6"
 
       "--jinja"

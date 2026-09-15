@@ -85,6 +85,7 @@
   },
   "model": "local/qwen3.6-35b-a3b",
   "small_model": "local-title/qwen3-4b-instruct-2507",
+  "subagent_depth": 2,
   "compaction": {
     "prune": true,
     "reserved": 10240,
@@ -148,7 +149,7 @@
       "temperature": 0.2
     },
     "orchestrate-local": {
-      "description": "Local lead engineer: investigates, integrates and verifies; delegates bounded work to local specialists.",
+      "description": "Local lead: holds the plan and integrates results, delegating specific tasks to explore/implementer/reviewer. Does not investigate or run builds itself.",
       "mode": "primary",
       "model": "local/qwen3.6-35b-a3b",
       "temperature": 0.6,
@@ -156,32 +157,52 @@
       "prompt": "{file:./prompts/orchestrate.md}",
       "permission": {
         "edit": "allow",
-        "bash": "allow",
+        "webfetch": "allow",
+        "bash": {
+          "*": "deny",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "git show*": "allow"
+        },
         "task": {
           "*": "deny",
           "explore": "allow",
           "implementer": "allow",
           "reviewer": "allow"
         },
-        "doom_loop": "deny"
+        "doom_loop": "deny",
+        "external_directory": {
+          "/nix/store/*": "allow"
+        }
       }
     },
     "orchestrate-frontier": {
-      "description": "Optional paid lead engineer using the same workflow and local specialists.",
+      "description": "Optional paid lead running the same orchestration-only workflow and the same local specialists. Does not investigate or run builds itself.",
       "mode": "primary",
       "model": "openai/gpt-5.6-terra",
       "reasoningEffort": "medium",
       "prompt": "{file:./prompts/orchestrate.md}",
       "permission": {
         "edit": "allow",
-        "bash": "allow",
+        "webfetch": "allow",
+        "bash": {
+          "*": "deny",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "git show*": "allow"
+        },
         "task": {
           "*": "deny",
           "explore": "allow",
           "implementer": "allow",
           "reviewer": "allow"
         },
-        "doom_loop": "deny"
+        "doom_loop": "deny",
+        "external_directory": {
+          "/nix/store/*": "allow"
+        }
       }
     },
     "code-local": {
@@ -195,54 +216,101 @@
         "edit": "allow",
         "bash": "allow",
         "task": "deny",
-        "doom_loop": "deny"
+        "doom_loop": "deny",
+        "external_directory": {
+          "/nix/store/*": "allow"
+        }
       }
     },
     "explore": {
-      "description": "Search unfamiliar areas and answer one bounded source question with paths and evidence. No shell or edits.",
+      "description": "Investigate one bounded question and answer it with paths and evidence. Reads source and runs read-only commands; cannot edit or execute anything mutating.",
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
       "temperature": 0.6,
       "top_p": 0.95,
       "prompt": "{file:./prompts/explore.md}",
-      "steps": 16,
+      "steps": 32,
       "permission": {
         "*": "deny",
         "read": "allow",
         "glob": "allow",
         "grep": "allow",
         "list": "allow",
-        "doom_loop": "deny"
+        "webfetch": "allow",
+        "doom_loop": "deny",
+        "bash": {
+          "*": "deny",
+          "ls*": "allow",
+          "wc*": "allow",
+          "stat*": "allow",
+          "readlink*": "allow",
+          "which*": "allow",
+          "grep*": "allow",
+          "rg*": "allow",
+          "sort*": "allow",
+          "uniq*": "allow",
+          "cut*": "allow",
+          "tr*": "allow",
+          "column*": "allow",
+          "echo*": "allow",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "git log*": "allow",
+          "git show*": "allow",
+          "nix eval*": "allow",
+          "nix search*": "allow",
+          "nix log*": "allow",
+          "nix flake show*": "allow",
+          "nix flake metadata*": "allow",
+          "journalctl*": "allow",
+          "systemctl status*": "allow",
+          "systemctl show*": "allow",
+          "systemctl is-active*": "allow",
+          "systemctl --user status*": "allow",
+          "systemctl --user show*": "allow",
+          "systemctl --user is-active*": "allow"
+        },
+        "external_directory": {
+          "/nix/store/*": "allow"
+        }
       }
     },
     "implementer": {
-      "description": "Own one bounded coding unit: investigate relevant files, implement the fix, and run focused tests. No delegation.",
+      "description": "Make one specific change: investigate the area, edit it, and run the check that proves it. Can ask explore for a bounded question; cannot delegate the change itself.",
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
       "temperature": 0.6,
       "top_p": 0.95,
       "prompt": "{file:./prompts/implementer.md}",
-      "steps": 40,
+      "steps": 48,
       "permission": {
         "*": "deny",
         "read": "allow",
         "glob": "allow",
         "grep": "allow",
         "list": "allow",
+        "webfetch": "allow",
         "edit": "allow",
         "bash": "allow",
         "skill": "allow",
-        "doom_loop": "deny"
+        "doom_loop": "deny",
+        "task": {
+          "*": "deny",
+          "explore": "allow"
+        },
+        "external_directory": {
+          "/nix/store/*": "allow"
+        }
       }
     },
     "reviewer": {
-      "description": "Independently check a nontrivial change for correctness and regressions; inspect source/diff and run focused checks. Report findings, do not fix.",
+      "description": "Independently check a nontrivial change for correctness and regressions; inspect source/diff and run focused checks. Can ask explore. Report findings, do not fix.",
       "mode": "subagent",
       "model": "local/qwen3.6-35b-a3b",
       "temperature": 0.6,
       "top_p": 0.95,
       "prompt": "{file:./prompts/reviewer.md}",
-      "steps": 20,
+      "steps": 24,
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -250,7 +318,14 @@
         "grep": "allow",
         "list": "allow",
         "bash": "allow",
-        "doom_loop": "deny"
+        "doom_loop": "deny",
+        "task": {
+          "*": "deny",
+          "explore": "allow"
+        },
+        "external_directory": {
+          "/nix/store/*": "allow"
+        }
       }
     },
     "raw": {
