@@ -23,10 +23,28 @@ separate context is useful:
 | orchestrate-frontier | Optional paid lead with the same local workers | Same as local lead |
 | raw | Chat and creative writing | No tools |
 
-The lead handles trivial work itself. For substantial work it delegates an
-implementation unit, integrates the result, and asks the reviewer to check
-nontrivial behavioral changes. A reviewer reports concrete bugs or verification
-gaps; it does not start another edit/review loop on its own.
+The lead delegates by default and keeps its own window for the plan, the
+decisions and the integration. Its prompt gives concrete triggers rather than
+leaving routing to judgement: delegate when answering needs files it has not
+read, when a change spans more than about two files or needs its own edit/test
+loop, when the work splits into units with acceptance checks, or when the
+session has already compacted once. It handles small in-context edits, single
+commands and integration itself.
+
+This matters because the lead's 64K window is the binding constraint. A worker's
+searching, reading and failed attempts stay in the worker's window; only its
+report reaches the lead. The prompt therefore also asks workers for integration
+facts only - outcome, changed paths, verification run and result, open issues -
+not reasoning or file contents.
+
+The `task` tool's built-in description argues the other way ("use Read instead
+of the Task tool"), and its `subagent_type` parameter is a free-form string with
+no enum and no agent roster, so the model learns the worker names only from the
+lead prompt. Both are handled explicitly: the prompt names `explore`,
+`implementer` and `reviewer` as literal `subagent_type` values and states that
+the tool's read-directly advice assumes a large context window and does not
+apply here. A reviewer reports concrete bugs or verification gaps; it does not
+start another edit/review loop on its own.
 
 Workers cannot call the Task tool. Explore has 16 steps, implementer 40 and
 reviewer 20. The lead has no fixed step cap: a worker limit produces a handoff,
@@ -59,7 +77,17 @@ simple chat/experiments, not an automatic fallback. Reasoning is mapped back to
 the model's `reasoning_content` field across tool calls.
 
 Titles use the separate CPU-only Qwen3-4B service on 8081. Compaction and summaries
-stay on the main local model. Existing compaction and tool-output limits remain.
+stay on the main local model.
+
+Context limits are tuned for the 64K window rather than left at upstream
+defaults. `tool_output` is capped at 500 lines / 20000 bytes: the previous 65536
+bytes was above OpenCode's own 51200 default and let a single grep, diff or test
+run consume roughly a quarter of the window. Output past the cap is still
+written to the truncation directory, which both leads can already read, so the
+full text stays available on demand instead of by default. `compaction.reserved`
+drops from 16384 to 10240, returning about 6K of working window; the lead's own
+turns are short once it delegates, so it does not need a buffer the size of the
+full 16K output ceiling. Pruning and `preserve_recent_tokens` are unchanged.
 
 ## Optional frontier use
 
@@ -121,6 +149,14 @@ off to reviewer. Both worker calls completed in sequence and the lead finished
 in 262.8 seconds. The five project tests and three independent checks passed;
 the reviewer reported no correctness findings. Delegation was explicitly
 requested in this test, so it verifies the worker path, not automatic routing.
+
+Both acceptance runs above predate the delegation-first routing rules and the
+tightened `tool_output` cap, so their request counts and wall times describe the
+earlier prompt. The delegation run in particular was explicitly asked to
+delegate; nothing here yet measures whether the lead now routes to a worker on
+its own, or how much less often it compacts. That is the thing to measure next:
+on a task spanning several files, count compactions per session and check
+whether any `task` call happens without being asked for.
 
 Transport tests against a disposable local API confirmed both thinking variants,
 temperature 0.6, top-p 0.95, the 16384-token output limit, tool availability and

@@ -64,20 +64,20 @@ in
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # programs.spicetify =
-  #   let
-  #     spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.system};
-  #   in
-  #   {
-  #     enable = true;
-  #     enabledExtensions = with spicePkgs.extensions; [
-  #       adblock
-  #       hidePodcasts
-  #       shuffle # shuffle+ (special characters are sanitized out of extension names)
-  #     ];
-  #     theme = spicePkgs.themes.catppuccin;
-  #     colorScheme = "mocha";
-  #   };
+  programs.spicetify =
+    let
+      spicePkgs = inputs.spicetify-nix.packages.${pkgs.system}.default;
+    in
+    {
+      enable = true;
+      enabledExtensions = with spicePkgs.extensions; [
+        adblock
+        hidePodcasts
+        shuffle # shuffle+ (special characters are sanitized out of extension names)
+      ];
+      theme = spicePkgs.themes.catppuccin;
+      colorScheme = "mocha";
+    };
 
   imports = [
     inputs.spicetify-nix.homeManagerModules.default
@@ -479,22 +479,7 @@ in
 
 
   # I should be executed for writing something like this. Forgive me dear observer
-# home.activation.postBuildScript = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-#   if [ ! -d "~/home_env" ]; then
-#       /run/current-system/sw/bin/python -m venv home_env
-#   fi
-# '';
 
-# programs.spicetify =
-#   let
-#     spicePkgs = inputs.spicetify-nix.packages.${pkgs.system}.default;
-#   in
-#   {
-#     enable = true;
-#     theme = spicePkgs.themes.Default;
-#   };
-
-    
 
 
 }
