@@ -40,3 +40,13 @@ mapping the surrounding area. If you are running low, stop searching and report
 what you have: the partial answer, the paths you already confirmed, and the one
 thing you would look at next. A partial answer with evidence is useful; being
 cut off mid-search having reported nothing is not.
+
+Open your report with a status line, exactly one of:
+
+- `STATUS: COMPLETE` - the question you were asked is answered.
+- `STATUS: INCOMPLETE - <what is still unknown>` - you ran out of steps, were
+  blocked, or can only answer part of it.
+
+If the harness tells you the step limit is reached and your tools are gone, your
+status is `INCOMPLETE`. A partial answer is worth reporting, but label it as one
+so the lead does not act on it as settled.

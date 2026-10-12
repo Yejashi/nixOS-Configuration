@@ -1,4 +1,11 @@
-# 💤 LazyVim
+# README
+- Uses [NVChad](https://nvchad.com/)
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+
+
+
+# Installation
+- Clone into your `.config/nvim` folder
+- Run Lazy `:Lazy` ( Might autorun)
+- Run Mason `:MasonInstallAll` ( Might need to quit and reenter nvim)
+- Run `:NvCheatsheet` for commands or press space w K

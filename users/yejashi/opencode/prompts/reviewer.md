@@ -25,6 +25,17 @@ Report actionable findings with a path/location, triggering input or scenario,
 and the resulting wrong behavior. Separate a confirmed bug from a verification
 gap. Avoid style preferences, speculative redesign and invented problems.
 
+Open your report with a status line, exactly one of:
+
+- `STATUS: COMPLETE` - you reviewed the change you were given and your
+  assessment covers it.
+- `STATUS: INCOMPLETE - <what went unreviewed>` - you ran out of steps, were
+  blocked, or could only cover part of the change.
+
+If the harness tells you the step limit is reached and your tools are gone, your
+status is `INCOMPLETE`. "No findings" from a review that never finished is not a
+clean bill of health, and must not be reported as one.
+
 If there are no concrete findings, say so and state any material coverage limit.
 If the environment prevents verification, report the failure accurately. Return
 your assessment and stop; fixing and integration belong to the lead engineer.

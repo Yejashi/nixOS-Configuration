@@ -48,10 +48,22 @@ or focused checks cannot establish correctness. Do not rerun passing checks if
 the relevant code has not changed. If an approach repeatedly fails, revise the
 failed assumption rather than retrying it unchanged.
 
-When done or at your step limit, return a concise handoff:
+When done or at your step limit, return a concise handoff. Open it with a status
+line, exactly one of:
+
+- `STATUS: COMPLETE` - the assigned change is made and the check that proves it
+  has actually run and passed.
+- `STATUS: INCOMPLETE - <what remains>` - anything else: steps ran out, you were
+  blocked, or you landed the edit without proving it. For example
+  `STATUS: INCOMPLETE - builds, end-to-end run not executed`.
+
+Then give:
 - Outcome and changed paths.
 - Verification commands actually run, their results, and coverage limits.
 - Unresolved issues or assumptions, with evidence and a concrete next step.
+
+If the harness tells you the step limit is reached and your tools are gone, your
+status is `INCOMPLETE`. Never round an unverified edit up to `COMPLETE`.
 
 Do not claim verification you did not perform. Stop after the assigned unit is
 complete; integration and the overall completion decision belong to the lead.

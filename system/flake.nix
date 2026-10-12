@@ -63,6 +63,20 @@
           # no ROCm support in nixpkgs, so Vulkan is the only GPU backend.
           llama-cpp-vulkan = unstable.llama-cpp-vulkan;
 
+          # The 2026-10-07 nixpkgs bump moved this from 2025-02-10 to
+          # 2026-07-07, and that release ships three symlinks pointing at icon
+          # names the tarball no longer contains (xsi-addon-symbolic,
+          # org.xfce.appfinder, and the -dark copy of the first). The
+          # noBrokenSymlinks hook makes those a build failure, which breaks
+          # both this package and anything pulling it in -- here, systemPackages
+          # and gtk.iconTheme. The dangling entries are icons for apps this
+          # host does not install, so GTK never looks them up; skipping the
+          # check keeps the theme on the current release instead of pinning it
+          # back. Drop this once upstream prunes the stale links.
+          tela-circle-icon-theme = prev.tela-circle-icon-theme.overrideAttrs {
+            dontCheckForBrokenSymlinks = true;
+          };
+
           gnome-ext-hanabi = prev.callPackage ../users/yejashi/pkgs/hanabi.nix { src = inputs.hanabi; };
         };
     in

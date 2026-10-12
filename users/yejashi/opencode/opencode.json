@@ -282,7 +282,7 @@
       "temperature": 0.6,
       "top_p": 0.95,
       "prompt": "{file:./prompts/implementer.md}",
-      "steps": 48,
+      "steps": 500,
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -310,7 +310,7 @@
       "temperature": 0.6,
       "top_p": 0.95,
       "prompt": "{file:./prompts/reviewer.md}",
-      "steps": 24,
+      "steps": 30,
       "permission": {
         "*": "deny",
         "read": "allow",

@@ -84,3 +84,5 @@ source ~/home_env/bin/activate
 if [[ "$TERM" == "xterm-kitty" ]]; then
     eval "$(starship init bash)"
 fi
+
+eval "$(zoxide init bash)"

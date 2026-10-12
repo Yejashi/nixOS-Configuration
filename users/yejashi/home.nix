@@ -40,6 +40,25 @@ let
             --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}
         '';
     };
+
+  # Fixes an argument-order bug that makes programs.spicetify.xpui inert. See
+  # the imports block below for why we need that option to work at all.
+  #
+  # Deliberately NOT the module-arg `pkgs`: this feeds `imports`, and `pkgs`
+  # depends on config (nixpkgs.config.allowUnfree below), so reaching for it
+  # here is an infinite recursion. `inputs` is an extraSpecialArg and carries no
+  # such dependency. The bare nixpkgs instance costs nothing real - all it does
+  # is rewrite one line of a Nix file.
+  spicetifyPatched = inputs.nixpkgs.legacyPackages.x86_64-linux.applyPatches {
+    name = "spicetify-flake-xpui-fix";
+    src = inputs.spicetify-nix;
+    postPatch = ''
+      substituteInPlace module.nix \
+        --replace-fail \
+          "recursiveUpdate cfg.xpui spiceLib.types.defaultXpui" \
+          "recursiveUpdate spiceLib.types.defaultXpui cfg.xpui"
+    '';
+  };
 in
 
 {
@@ -108,6 +127,29 @@ in
           ln -s spicetify-cli $out/bin/spicetify
           cp -r ${pkgs.spicetify-cli}/share/spicetify/jsHelper $out/bin/jsHelper
         '';
+
+      # StarryNight lives in the spicetify/spicetify-themes checkout that this
+      # flake already fetches, but pkgs/themes.nix never runs mkOfficialTheme
+      # on it, so there is no spicePkgs.themes.StarryNight to use. The fetched
+      # source is still reachable through any theme that does come from that
+      # repo, so borrow it from one and hand-roll the same attrset shape
+      # mkOfficialTheme would have produced.
+      #
+      # theme.js (the shooting-star animation) is not an extension here: the
+      # builder copies the whole theme folder, and spicetify's inject_theme_js
+      # picks up Themes/StarryNight/theme.js on its own. Listing it under
+      # requiredExtensions as well would load it twice.
+      officialThemes = spicePkgs.themes.Sleek.src;
+
+      starryNight = {
+        name = "StarryNight";
+        src = officialThemes;
+        appendName = true;
+        injectCss = true;
+        replaceColors = true;
+        overwriteAssets = false;
+        sidebarConfig = false;
+      };
     in
     {
       enable = true;
@@ -117,12 +159,35 @@ in
         hidePodcasts
         shuffle # shuffle+ (special characters are sanitized out of extension names)
       ];
-      theme = spicePkgs.themes.catppuccin;
-      colorScheme = "mocha";
+      xpui.AdditionalOptions.sidebar_config = false;
+      enabledCustomApps = with spicePkgs.apps; [ marketplace ];
+      theme = starryNight;
+      # color.ini sections: Base, Cotton-candy, Forest, Galaxy, Orange, Sky,
+      # Sunrise.
+      colorScheme = "Base";
     };
 
   imports = [
-    inputs.spicetify-nix.homeManagerModules.default
+    # Spotify pops a snackbar on every launch: "Sidebar config is not supported
+    # when Global Navbar is enabled. In your terminal, please run spicetify
+    # config sidebar_config 0". It comes from helper/sidebarConfig.js, which
+    # spicetify injects into Apps/xpui/index.html whenever
+    # [AdditionalOptions]/sidebar_config is 1. Two bugs in this fork conspire to
+    # pin it there:
+    #
+    # 1. A theme's sidebarConfig is written to [Setting]/sidebar_config, but
+    #    spicetify reads [AdditionalOptions]/sidebar_config. So the theme has no
+    #    say, and the generated ini carries both keys with opposite values.
+    #
+    # 2. The [AdditionalOptions] copy comes from cfg.xpui, which module.nix
+    #    computes as `recursiveUpdate cfg.xpui defaultXpui`. recursiveUpdate
+    #    lets its RIGHT argument win, so the defaults clobber everything the
+    #    user sets and the whole xpui option does nothing.
+    #
+    # Patching (2) is the smaller fix and makes xpui behave as documented, which
+    # then lets us set sidebar_config directly. The swap is otherwise a no-op:
+    # cfg.xpui's own defaults are defaultXpui, so unset keys resolve the same.
+    ((import "${spicetifyPatched}/module.nix") { isNixOSModule = false; })
   ];
 
   home.sessionVariables = {
@@ -197,6 +262,7 @@ in
     gnomeExtensions.user-themes
     gnomeExtensions.quick-settings-audio-panel
     gnomeExtensions.forge
+    gnomeExtensions.clipboard-history
     linuxKernel.packages.linux_zen.cpupower
     viewnior
     glow
@@ -243,6 +309,13 @@ in
     vscode-langservers-extracted
     yaml-language-server
     marksman
+    zoxide
+    reptyr
+    pi-coding-agent
+    crush
+    # pi shells out to npm to install its packages (tellico-agentic-setup's
+    # pi-tellico needs it for Magic Context), and that repo's tests run on node.
+    nodejs
   ];
 
   xdg.desktopEntries.lm-studio = {
@@ -283,10 +356,31 @@ in
       recursive = true;
     };
 
-    ".config/input-remapper-2" = {
-      source = ./input-remapper-2;
+    # config.json is generated rather than symlinked from ./input-remapper-2.
+    # input-remapper runs its migration on *every* invocation, and the last
+    # step rewrites config.json to stamp the running version -- which dies
+    # with EROFS when the file is a read-only store symlink, taking the whole
+    # autoload command with it. Emitting the running version here makes the
+    # `v < VERSION` guard false, so the migration becomes a permanent no-op
+    # and never attempts the write. Reading the version off the package
+    # itself means a future input-remapper bump can't quietly bring the
+    # breakage back, the way a hardcoded "2.2.0" would.
+    ".config/input-remapper-2/config.json".text = builtins.toJSON {
+      version = pkgs.input-remapper.version;
+      autoload = {
+        # Keys are input-remapper *group* keys -- the shortest evdev name of
+        # the device. Entries for absent devices are simply never matched.
+        "USB OPTICAL MOUSE " = "Mouse Volume";
+        "LIFT Mouse" = "Mouse Volume";
+      };
+    };
+
+    ".config/input-remapper-2/presets" = {
+      source = ./input-remapper-2/presets;
       recursive = true;
     };
+
+    ".config/input-remapper-2/xmodmap.json".source = ./input-remapper-2/xmodmap.json;
 
     # Make firefox look roundy, might i say ride eternal, shiny and chrome
     # ".mozilla/firefox/huuecasm.default/chrome" = {
@@ -364,6 +458,7 @@ in
         "quick-settings-audio-panel@rayzeq.github.io"
         "forge@jmmaranan.com"
         "hanabi-extension@jeffshee.github.io"
+        "clipboard-history@alexsaveau.dev"
       ];
 
       favorite-apps = [
@@ -459,6 +554,34 @@ in
   # module (that only exists upstream, gated behind adding their flakes as
   # inputs). Wire up the same systemd --user services their module would
   # generate by hand instead of pulling in two more flake inputs.
+  # The root daemon comes up with config_dir = None: daemon.py only calls
+  # set_config_dir for a non-root user, and as a systemd service it is root.
+  # Until some *session* process hands it a config dir it refuses every
+  # autoload. The udev rules cannot do it either -- they fire as root, and
+  # input_remapper_control.py skips set_config_dir for root. So the udev half
+  # alone maps nothing after a reboot; this is the other half. It points the
+  # daemon at this user's config once per login and loads whatever is already
+  # connected, after which udev can handle the mouse coming and going.
+  #
+  # Upstream ships exactly this as an XDG autostart .desktop, which the NixOS
+  # module does not install -- hence doing it as a user unit here.
+  systemd.user.services.input-remapper-autoload = {
+    Unit = {
+      Description = "Autoload input-remapper presets for this session";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      # Mirrors upstream's `stop-all && autoload`; the stop clears injections
+      # left by a previous session and is allowed to fail on a clean boot.
+      ExecStartPre = "-${pkgs.input-remapper}/bin/input-remapper-control --command stop-all";
+      ExecStart = "${pkgs.input-remapper}/bin/input-remapper-control --command autoload";
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
   systemd.user.services.elephant = {
     Unit = {
       Description = "Elephant launcher backend";

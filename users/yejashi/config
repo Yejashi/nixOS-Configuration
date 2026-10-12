@@ -2,6 +2,10 @@ Host dane.llnl.gov
   HostName dane.llnl.gov
   User bogale2
 
+Host matrix.llnl.gov
+  HostName matrix.llnl.gov
+  User bogale2
+
 Host 149.165.174.253
   HostName 149.165.174.253
 
@@ -51,7 +55,7 @@ Host tellico
   IPQoS=throughput
   Ciphers=aes128-ctr
   PubKeyAuthentication yes
-  IdentityFile /home/yejashi/.ssh/id_ed25519.pub
+  IdentityFile /home/yejashi/.ssh/id_ed25519
 
 Host hydra
   HostName hydra12.eecs.utk.edu

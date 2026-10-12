@@ -73,10 +73,28 @@ home-manager switch --flake ./system
 
 ***
 
+### Local LLM on demand
+
+After applying the system configuration with `sudo nixos-rebuild switch --flake ./system#yejashi`:
+
+```sh
+llm on      # Start the main model and the small title model
+llm off     # Stop both models and release their RAM/VRAM
+llm status  # Show each service's state (also the default for `llm`)
+```
+
+Models stay off after reboot until you run `llm on`. Startup loads the models
+into memory, so allow a moment before sending a request. Turning them off
+interrupts any active local generation. The nightly refresh does not start a
+stopped model.
+
+The `yejashi` account can run these commands without sudo, including over SSH.
+OpenCode keeps its local model assignments; run `llm on` before using them.
+
 ### Steps i haven't been able to add into the nixOS config yet.
 
 Add flathub repository:
 ```
 sudo flatpak remote-add flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-```
+``
 

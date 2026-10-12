@@ -297,6 +297,17 @@
   programs.firefox.enable = true;
   programs.steam.enable = true;
   services.input-remapper.enable = true;
+  # The LIFT is a Bluetooth mouse, so it appears well after login -- a
+  # login-time autoload would run before the device exists and map nothing.
+  # These udev rules are what re-run autoload on every connect, which is the
+  # only hook that fires at the right moment for a device that comes and goes.
+  #
+  # The module defaults this off over sezanzeb/input-remapper#140: the rule
+  # RUNs input-remapper-control for every input device added, and that call
+  # blocks on dbus, so a daemon that is not up yet costs a udev timeout per
+  # device at boot. Accepted here because the side buttons are worthless
+  # without it; revert this line first if boots start dragging.
+  services.input-remapper.enableUdevRules = true;
   services.flatpak.enable = true;
 
   # Docker, for the SWE-bench harness (~/Documents/repos/benchmarks/oc-bench).
@@ -344,6 +355,41 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    (writeShellApplication {
+      name = "llm";
+      runtimeInputs = [ systemd ];
+      text = ''
+        units=(llama-cpp.service llama-cpp-small.service)
+        if [[ $# -gt 1 ]]; then
+          echo "Usage: llm [on|off|status]" >&2
+          exit 2
+        fi
+        case "''${1:-status}" in
+          on)
+            systemctl start "''${units[@]}"
+            echo "Local LLM services started. Models may take a moment to load."
+            ;;
+          off)
+            systemctl stop "''${units[@]}"
+            echo "Local LLM services stopped; model memory released."
+            ;;
+          status)
+            for unit in "''${units[@]}"; do
+              state=$(systemctl show "$unit" --property=ActiveState --value)
+              printf '%s: %s\n' "$unit" "$state"
+            done
+            ;;
+          -h|--help)
+            echo "Usage: llm [on|off|status]"
+            echo "Start or stop both local models, or show their service state."
+            ;;
+          *)
+            echo "Usage: llm [on|off|status]" >&2
+            exit 2
+            ;;
+        esac
+      '';
+    })
     wget
     curl
     zip
@@ -590,6 +636,8 @@
   };
 
   systemd.services.llama-cpp = {
+    # Load models only on demand with `llm on`, not at boot.
+    wantedBy = lib.mkForce [ ];
     # ProtectHome=true also hides $HOME from RADV, which then fails to create
     # its shader cache ("Permission denied---disabling") and recompiles every
     # shader on each start. Point it at the unit's own CacheDirectory.
@@ -615,7 +663,6 @@
   # meaningfully steal cores from the 35B's 8 CPU-resident expert threads.
   systemd.services.llama-cpp-small = {
     description = "llama.cpp server (4B) for OpenCode title and metadata calls";
-    wantedBy = [ "multi-user.target" ];
     after = [ "network.target" ];
     environment = {
       HOME = "/var/lib/llama-cpp-small";
@@ -682,6 +729,18 @@
       Persistent = false;
     };
   };
+
+  # Allow the workstation owner to use `llm on/off`, including over SSH.
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id === "org.freedesktop.systemd1.manage-units" &&
+          subject.user === "yejashi" &&
+          ["llama-cpp.service", "llama-cpp-small.service"].indexOf(action.lookup("unit")) !== -1 &&
+          ["start", "stop"].indexOf(action.lookup("verb")) !== -1) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
 
   # Model store outside /home, readable by the unit's DynamicUser.
   systemd.tmpfiles.rules = [
