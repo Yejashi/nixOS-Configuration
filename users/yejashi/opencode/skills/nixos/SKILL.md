@@ -72,7 +72,7 @@ Current `system/flake.nix` uses:
 
 - `nixpkgs` -> `nixos-26.05`
 - `nixpkgs-unstable` -> `nixpkgs-unstable`
-- `nixpkgs-opencode` -> a separately pinned revision for the working OpenCode build
+- `opencode` -> upstream's own flake, pinned to a release tag (OpenCode 2)
 - `home-manager` -> `release-26.05`, following stable `nixpkgs`
 - `spicetify-nix`
 - `zen-browser`
@@ -80,10 +80,10 @@ Current `system/flake.nix` uses:
 The machine intentionally stays on stable NixOS while selected fast-moving packages come from unstable.
 
 The overlay is supplied to both NixOS and Home Manager. `pkgs.opencode` comes
-from the separate `nixpkgs-opencode` input; `pkgs.llama-cpp-vulkan` comes from
-unstable. Read `system/flake.nix` for the current pins and the reason for the
-OpenCode exception. Do not replace that pin merely because another build has
-the same version string.
+from the upstream `opencode` flake input, because nixpkgs only packages
+OpenCode 1; `pkgs.llama-cpp-vulkan` comes from unstable. Read
+`system/flake.nix` for the current pins. Upgrade OpenCode by bumping the
+release tag in that input, not by following the dev branch.
 
 Use stable by default. If one package needs unstable, add it to the existing
 overlay attribute set while preserving the other definitions:
