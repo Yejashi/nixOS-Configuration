@@ -316,6 +316,7 @@ in
     # pi shells out to npm to install its packages (tellico-agentic-setup's
     # pi-tellico needs it for Magic Context), and that repo's tests run on node.
     nodejs
+    webex
   ];
 
   xdg.desktopEntries.lm-studio = {
