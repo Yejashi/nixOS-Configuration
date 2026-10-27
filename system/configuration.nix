@@ -156,6 +156,9 @@
               edge-tiling=true
           '';
       };
+
+      # KDE Plasma 6 alongside GNOME; pick the session from GDM's gear menu.
+      plasma6.enable = true;
     };
 
     avahi = {
@@ -167,6 +170,16 @@
 
     pulseaudio.enable = false;
   };
+
+  # GNOME (seahorse) and Plasma (ksshaskpass) both set an SSH askpass helper;
+  # keep GNOME's so the conflict resolves.
+  programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
+
+  # Plastile tiling for the Plasma session (users/yejashi/pkgs/plastile.nix).
+  # systemPackages (below) puts the KWin script and effect on XDG_DATA_DIRS;
+  # the dbus entry registers its persistence helper for session-bus
+  # activation. Enabling it per user happens in home.nix (kwinrc [Plugins]).
+  services.dbus.packages = [ pkgs.plastile ];
 
 
   services.tailscale = {
@@ -422,6 +435,16 @@
 
     # Gnome Packages
     gnome-tweaks
+
+    # KDE Plasma: Plastile tiling (see services.dbus.packages above), the
+    # rounded-corners KWin effect, Klassy (window decoration), Darkly (Qt
+    # app style) and Panel Colorizer (panel widget). They load into KWin,
+    # Qt apps or plasmashell, so they live here rather than in home.packages.
+    plastile
+    kde-rounded-corners
+    klassy
+    darkly
+    plasma-panel-colorizer
     kitty-themes
 
     # Icons + Themes

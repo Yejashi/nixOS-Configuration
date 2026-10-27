@@ -31,6 +31,19 @@
       flake = false;
     };
 
+    # Declarative KDE Plasma settings (theme, panel, shortcuts) for home-manager.
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
+    # Plastile, the KWin tiling script. `nix flake update plastile` to bump.
+    plastile = {
+      url = "github:Yejashi/plastile";
+      flake = false;
+    };
+
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, opencode, home-manager, ... }@inputs:
@@ -55,6 +68,13 @@
           # no ROCm support in nixpkgs, so Vulkan is the only GPU backend.
           llama-cpp-vulkan = unstable.llama-cpp-vulkan;
 
+          # Panel Colorizer plasmoid (compiled plugin, loaded by plasmashell)
+          # must match the unstable Plasma in plasmaOverlay. It lives here,
+          # not there, because plasma-manager adds it to home.packages from
+          # home-manager's pkgs whenever a panel uses the widget. It is a
+          # leaf, so nothing stable links against its unstable libraries.
+          plasma-panel-colorizer = unstable.plasma-panel-colorizer;
+
           # The 2026-10-07 nixpkgs bump moved this from 2025-02-10 to
           # 2026-07-07, and that release ships three symlinks pointing at icon
           # names the tarball no longer contains (xsi-addon-symbolic,
@@ -71,6 +91,32 @@
 
           gnome-ext-hanabi = prev.callPackage ../users/yejashi/pkgs/hanabi.nix { src = inputs.hanabi; };
         };
+
+      # Plasma 6.7 from unstable: stable ships KWin 6.6, and Plastile needs
+      # KWin >= 6.7. Same Qt (6.11) on both branches. This moves the whole KDE
+      # stack (frameworks, Plasma, KDE apps); GNOME is untouched.
+      #
+      # System only, not home-manager: unstable's KDE libraries need its newer
+      # glibc, so any stable package built against them (LibreOffice's Qt
+      # backend, for one) would be rebuilt from source and fail to link.
+      plasmaOverlay = final: prev:
+        let
+          unstable = import nixpkgs-unstable {
+            inherit system;
+            config = prev.config;
+          };
+        in
+        {
+          kdePackages = unstable.kdePackages;
+          # Compiled KWin effect: must match the KWin above.
+          kde-rounded-corners = unstable.kde-rounded-corners;
+          # Window decoration + Qt style plugins loaded by KWin and Qt apps:
+          # same reason.
+          klassy = unstable.klassy;
+          darkly = unstable.darkly;
+          # Built with unstable's toolchain for the same glibc reason.
+          plastile = unstable.callPackage ../users/yejashi/pkgs/plastile.nix { src = inputs.plastile; };
+        };
     in
     {
       nixosConfigurations.yejashi = nixpkgs.lib.nixosSystem {
@@ -78,7 +124,7 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
-          { nixpkgs.overlays = [ unstableOverlay ]; }
+          { nixpkgs.overlays = [ unstableOverlay plasmaOverlay ]; }
         ];
       };
 

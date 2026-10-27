@@ -188,6 +188,9 @@ in
     # then lets us set sidebar_config directly. The swap is otherwise a no-op:
     # cfg.xpui's own defaults are defaultXpui, so unset keys resolve the same.
     ((import "${spicetifyPatched}/module.nix") { isNixOSModule = false; })
+
+    # KDE Plasma session: theme, panel, Plastile tiling, keybindings.
+    ./plasma.nix
   ];
 
   home.sessionVariables = {
@@ -317,6 +320,7 @@ in
     # pi-tellico needs it for Magic Context), and that repo's tests run on node.
     nodejs
     webex
+    code-cursor
   ];
 
   xdg.desktopEntries.lm-studio = {
@@ -549,6 +553,10 @@ in
     # sidebar selection highlight. GTK4/libadwaita apps fall back to
     # stock Adwaita instead of a possibly-incompatible custom theme.
     gtk4.theme = null;
+
+    # Plasma's gtkconfig daemon rewrites ~/.gtkrc-2.0 at every Plasma login,
+    # replacing this symlink with a plain file; take it back on each switch.
+    gtk2.force = true;
   };
 
   # nixpkgs ships plain `walker`/`elephant` packages but no home-manager

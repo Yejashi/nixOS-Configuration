@@ -159,6 +159,45 @@
         "type": "github"
       }
     },
+    "plasma-manager": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785762349,
+        "narHash": "sha256-jZhZkzAwc7f3exzcTDJWP2WCAchCv0iNC3UF/QsahdQ=",
+        "owner": "nix-community",
+        "repo": "plasma-manager",
+        "rev": "a19a2a029fa180911bd89c554dca1616e10f4c1d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "plasma-manager",
+        "type": "github"
+      }
+    },
+    "plastile": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793016449,
+        "narHash": "sha256-UhJ8FqRb27fHYjCJ6YGi3Mx6dlmpcE5OPHVv8BLqgVA=",
+        "owner": "Yejashi",
+        "repo": "plastile",
+        "rev": "4c2bfe80dc1c047894938265a825b73b6ea6aac1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Yejashi",
+        "repo": "plastile",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "hanabi": "hanabi",
@@ -166,6 +205,8 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "opencode": "opencode",
+        "plasma-manager": "plasma-manager",
+        "plastile": "plastile",
         "spicetify-nix": "spicetify-nix",
         "zen-browser": "zen-browser"
       }
