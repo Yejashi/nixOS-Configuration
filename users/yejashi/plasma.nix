@@ -170,8 +170,6 @@ in
   imports = [ inputs.plasma-manager.homeModules.plasma-manager ];
 
   home.packages = with pkgs; [
-    (papirus-icon-theme.override { color = "palebrown"; })
-    bibata-cursors
     inter
   ];
 
@@ -190,9 +188,9 @@ in
         library = "org.kde.klassy";
         theme = "Klassy";
       };
-      iconTheme = "Papirus-Dark";
+      iconTheme = "Tela-circle-dark"; # system package (configuration.nix)
       cursor = {
-        theme = "Bibata-Modern-Classic";
+        theme = "breeze_cursors"; # Plasma's default cursor
         size = 24;
       };
       splashScreen.theme = "None";
@@ -337,14 +335,15 @@ in
       };
     };
 
-    # Klassy window decoration: small circular "traffic light" buttons in the
-    # color scheme's red/yellow/green, left-aligned bold title, no separator
+    # Klassy window decoration: plain line-style minimize/maximize/close
+    # icons in the title text color (close turns red on hover), rounded
+    # hover backgrounds, left-aligned bold title, no separator
     # line, titlebar blended into the window header. Enum values are the
     # choice names from klassy-decoration.kcfg.
     configFile."klassy/klassyrc" = {
       Windeco = {
-        ButtonIconStyle = "StyleKisweet";
-        ButtonShape = "ShapeSmallCircle";
+        ButtonIconStyle = "StyleKite";
+        ButtonShape = "ShapeIntegratedRoundedRectangle";
         IconSize = "IconMedium";
         WindowCornerRadius = 12;
         DrawTitleBarSeparator = false;
@@ -353,7 +352,7 @@ in
         ColorizeWindowOutlineWithButton = false;
       };
       ButtonColors = {
-        ButtonIconColorsActive = "AccentTrafficLights";
+        ButtonIconColorsActive = "TitleBarTextNegativeClose";
         ButtonIconColorsInactive = "TitleBarText";
       };
       TitleBarSpacing = {
