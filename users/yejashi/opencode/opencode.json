@@ -81,6 +81,99 @@
           }
         }
       }
+    },
+    "tellico": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Tellico (Jetstream tunnel)",
+      "options": {
+        "baseURL": "https://tellico-llm-tunnel.asc200035.projects.jetstream-cloud.org/v1",
+        "apiKey": "{env:TELLICO_API_KEY}",
+        "headerTimeout": 900000
+      },
+      "models": {
+        "qwen3.6-35b-a3b": {
+          "name": "Qwen3.6 35B-A3B 128k (tellico)",
+          "temperature": true,
+          "reasoning": true,
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          },
+          "options": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "parallel_tool_calls": true,
+            "chat_template_kwargs": {
+              "enable_thinking": true
+            }
+          },
+          "variants": {
+            "low": {
+              "disabled": true
+            },
+            "medium": {
+              "disabled": true
+            },
+            "high": {
+              "disabled": true
+            },
+            "thinking": {
+              "chat_template_kwargs": {
+                "enable_thinking": true
+              }
+            },
+            "off": {
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        },
+        "qwen3.8-27b": {
+          "name": "Qwen3.8 27B 128k (tellico)",
+          "temperature": true,
+          "reasoning": true,
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          },
+          "options": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "parallel_tool_calls": true,
+            "chat_template_kwargs": {
+              "enable_thinking": true
+            }
+          },
+          "variants": {
+            "low": {
+              "disabled": true
+            },
+            "medium": {
+              "disabled": true
+            },
+            "high": {
+              "disabled": true
+            },
+            "thinking": {
+              "chat_template_kwargs": {
+                "enable_thinking": true
+              }
+            },
+            "off": {
+              "chat_template_kwargs": {
+                "enable_thinking": false
+              }
+            }
+          }
+        }
+      }
     }
   },
   "model": "local/qwen3.6-35b-a3b",

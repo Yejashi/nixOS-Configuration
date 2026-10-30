@@ -32,10 +32,25 @@ let
               fi
             done
           '';
+
+          # TELLICO_API_KEY for the `tellico` provider in opencode.json. Read
+          # at launch rather than set in the wrapper (which would put the key
+          # in the world-readable store), and from here rather than the shell
+          # profile so it also reaches launches with no profile: T3 Code
+          # starting opencode from a desktop launcher, the systemd service.
+          loadTellicoEnv = writeShellScript "load-tellico-env" ''
+            envFile="''${XDG_CONFIG_HOME:-$HOME/.config}/tellico-llm.env"
+            if [ -r "$envFile" ]; then
+              set -a
+              . "$envFile"
+              set +a
+            fi
+          '';
         in
         ''
           wrapProgram $out/bin/opencode \
             --run ${silenceHarnessMemoryLogs} \
+            --run ". ${loadTellicoEnv}" \
             --prefix PATH : ${lib.makeBinPath [ nodejs ]} \
             --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}
         '';
@@ -191,6 +206,9 @@ in
 
     # KDE Plasma session: theme, panel, Plastile tiling, keybindings.
     ./plasma.nix
+
+    # programs.hermes-agent / services.hermes-agent, configured below.
+    inputs.hermes-agent.homeManagerModules.default
   ];
 
   home.sessionVariables = {
@@ -316,11 +334,16 @@ in
     reptyr
     pi-coding-agent
     crush
+    # GUI over the agent CLIs. Uses opencode (wrapped above) for the tellico
+    # models: pick a `tellico/...` model in the OpenCode provider.
+    t3code
     # pi shells out to npm to install its packages (tellico-agentic-setup's
     # pi-tellico needs it for Magic Context), and that repo's tests run on node.
     nodejs
     webex
     code-cursor
+    kdePackages.isoimagewriter
+    popsicle
   ];
 
   xdg.desktopEntries.lm-studio = {
@@ -650,6 +673,38 @@ in
       RestartSec = 5;
     };
     Install.WantedBy = [ "default.target" ];
+  };
+
+  # Hermes Agent: the `hermes` CLI and Hermes Desktop, both talking to the
+  # tellico llama.cpp fleet through the Jetstream tunnel.
+  #
+  # services.hermes-agent.enable is only here so activation renders `settings`
+  # into ~/.hermes/config.yaml and merges the env file into ~/.hermes/.env.
+  # No gateway and no backend service (backend.mode defaults to "none"), so
+  # nothing runs in the background; the desktop app starts its own backend.
+  # A side effect of enable: config edits through `hermes config`/`hermes
+  # model` are refused -- change them here instead. `/model` mid-session still
+  # works for switching between the tellico models.
+  #
+  # The API key never enters the Nix store (world-readable). Create the file
+  # once, by hand (opencodeWrapped reads the same file):
+  #   install -m 600 /dev/null ~/.config/tellico-llm.env
+  #   echo 'TELLICO_API_KEY=sk-tellico-...' > ~/.config/tellico-llm.env
+  programs.hermes-agent = {
+    enable = true;
+    desktop.enable = true;
+  };
+  services.hermes-agent = {
+    enable = true;
+    environmentFiles = [ "${config.home.homeDirectory}/.config/tellico-llm.env" ];
+    settings.model = {
+      provider = "custom";
+      base_url = "https://tellico-llm-tunnel.asc200035.projects.jetstream-cloud.org/v1";
+      key_env = "TELLICO_API_KEY";
+      # Router alias; the -node0/-node1 ids pin one box. See /v1/models.
+      default = "qwen3.6-35b-a3b";
+      context_length = 131072;
+    };
   };
 
 

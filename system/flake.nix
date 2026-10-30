@@ -14,6 +14,12 @@
     # several times a day. Bump the tag to upgrade.
     opencode.url = "github:anomalyco/opencode/v2.0.26";
 
+    # Hermes Agent (CLI + Electron desktop) from Nous Research's own flake;
+    # not in nixpkgs. Pinned to a release tag, same reasoning as opencode.
+    # Its nixpkgs is left alone: the package is built against the uv2nix lock
+    # upstream tests with, and following ours would just invite breakage.
+    hermes-agent.url = "github:NousResearch/hermes-agent/v2026.9.24";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -67,6 +73,25 @@
           # (--spec-type draft-mtp, --fit, --load-mode). The RX 6750 XT has
           # no ROCm support in nixpkgs, so Vulkan is the only GPU backend.
           llama-cpp-vulkan = unstable.llama-cpp-vulkan;
+
+          # Stable's T3 Code is 0.0.24 and this is a fast-moving 0.0.x app;
+          # its OpenCode provider is what reaches the tellico models.
+          # Electron leaf, nothing links against it.
+          #
+          # The package sets dontPatchELF, so node-pty's vendored prebuilt has
+          # no way to find libstdc++. The backend dies on startup when it fails
+          # to load, and the app never opens a window. RPATH rather than
+          # LD_LIBRARY_PATH on the wrapper, which would leak into every agent
+          # and terminal T3 Code spawns. Drop this once nixpkgs patches it.
+          t3code = unstable.t3code.override {
+            t3code-unwrapped = unstable.t3code.unwrapped.overrideAttrs (old: {
+              postFixup = (old.postFixup or "") + ''
+                find "$out"/libexec/t3code -type f \
+                  -path '*/node-pty/prebuilds/linux-x64/pty.node' \
+                  -exec patchelf --add-rpath ${unstable.lib.makeLibraryPath [ unstable.stdenv.cc.cc.lib ]} {} +
+              '';
+            });
+          };
 
           # Panel Colorizer plasmoid (compiled plugin, loaded by plasmashell)
           # must match the unstable Plasma in plasmaOverlay. It lives here,
